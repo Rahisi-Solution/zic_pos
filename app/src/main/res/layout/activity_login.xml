@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".authentication.LoginActivity">
+
+    <ImageView
+        android:id="@+id/app_logo"
+        android:layout_width="80dp"
+        android:layout_height="70dp"
+        android:src="@drawable/zic_logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_bias="0.1"
+        android:layout_marginHorizontal="20dp"
+        />
+
+    <TextView
+        android:id="@+id/welcome_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/welcome"
+        android:fontFamily="@font/rubik_regular"
+        android:textSize="30sp"
+        app:layout_constraintTop_toBottomOf="@id/app_logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.03"
+        app:layout_constraintHorizontal_bias="0"
+        android:layout_marginHorizontal="30dp"
+        />
+
+    <TextView
+        android:id="@+id/welcome_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/please_sign_in_to_continue"
+        android:fontFamily="@font/rubik_regular"
+        android:textSize="19sp"
+        app:layout_constraintTop_toBottomOf="@id/welcome_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintHorizontal_bias="0"
+        android:layout_marginHorizontal="30dp"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:id="@+id/officer_number_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/welcome_subtitle"
+        android:layout_marginHorizontal="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.1"
+        android:hint="@string/officer_number"
+        android:backgroundTint="@color/purple_500"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/officer_number_field"
+            android:inputType="numberSigned"
+            android:layout_width="match_parent"
+            android:fontFamily="@font/rubik_light"
+            android:maxLength="6"
+            android:textSize="20sp"
+            android:paddingVertical="16dp"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:id="@+id/officer_pin_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/officer_number_layout"
+        android:layout_marginHorizontal="30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.05"
+        android:fontFamily="@font/rubik_regular"
+        android:textSize="23sp"
+        android:hint="@string/officer_pin"
+        android:backgroundTint="@color/purple_500"
+        app:endIconMode="password_toggle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/officer_pin_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberPassword"
+            android:fontFamily="@font/rubik_light"
+            android:textSize="20sp"
+            android:paddingVertical="16dp"
+            android:maxLength="4"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/officer_pin_layout"
+        android:layout_marginHorizontal="30dp"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="@font/rubik_regular"
+        android:text="@string/login"
+        android:backgroundTint="@color/primary_color"
+        android:textSize="18sp"
+        android:paddingVertical="16dp"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:id="@+id/reset_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/login_button"
+        android:layout_marginHorizontal="30dp"
+        app:layout_constraintVertical_bias="0.04"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/transparent"
+        android:fontFamily="@font/rubik_regular"
+        android:text="@string/forgot_officer_pin"
+        android:textSize="15sp"
+        android:textColor="@color/primary_color"
+        android:paddingVertical="5dp"
+        />
+
+    <TextView
+        android:id="@+id/powered_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/powered_by"
+        android:fontFamily="@font/rubik_light"
+        app:layout_constraintTop_toBottomOf="@id/reset_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.6"
+        />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:src="@drawable/rahisi_colored"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/powered_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
