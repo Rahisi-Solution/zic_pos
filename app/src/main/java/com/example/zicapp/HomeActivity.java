@@ -137,6 +137,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (result.getResultCode() == RESULT_CANCELED) {
                     if(result.getData() != null) {
                         String data = result.getData().getStringExtra("qrCode");
+                        System.out.println("Qr Code data = " + data);
                         assert data != null;
                         if(data.startsWith("https://")){
                             showSuccessDialog();

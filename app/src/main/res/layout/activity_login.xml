@@ -65,7 +65,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.1"
         android:hint="@string/officer_number"
-        android:backgroundTint="@color/purple_500"
+        android:backgroundTint="#001d3d"
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -95,7 +95,7 @@
         android:fontFamily="@font/rubik_regular"
         android:textSize="23sp"
         android:hint="@string/officer_pin"
-        android:backgroundTint="@color/purple_500"
+        android:backgroundTint="#001d3d"
         app:endIconMode="password_toggle">
 
         <com.google.android.material.textfield.TextInputEditText
