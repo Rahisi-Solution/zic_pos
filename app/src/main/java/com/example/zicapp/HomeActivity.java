@@ -6,16 +6,19 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -23,16 +26,28 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.zicapp.utils.Config;
 import com.example.zicapp.utils.OfflineDB;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
     OfflineDB offlineDB = new OfflineDB(HomeActivity.this);
@@ -40,18 +55,25 @@ public class HomeActivity extends AppCompatActivity {
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     Date date = new Date();
-
     private String username;
     private String entrypoint;
     int total_certificates;
-
     View parentLayout;
     TextView user_name;
     TextView entry_point;
     TextView today_date;
     TextView total_visitors;
-
+    private String authToken;
+    String applicantName;
+    String referenceNumber;
+    String nationality;
+    String arrivalDate;
+    String passportNumber;
+    String applicationStatus;
     private Dialog checkedOutDialog;
+    private ProgressDialog searchDialog;
+    SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+    private String tag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,7 +234,119 @@ public class HomeActivity extends AppCompatActivity {
         checkedOutDialog.show();
     }
 
+    // Error dialog to show when scan arrival or departure failed //
+    private void showCheckedDialog(String applicantName, String referenceNumber, String status, int flag) {
+        checkedOutDialog = new Dialog(this);
+        checkedOutDialog.setCanceledOnTouchOutside(false);
+        checkedOutDialog.setContentView(R.layout.error_dialog);
+
+        TextView message = checkedOutDialog.findViewById(R.id.message_title);
+        TextView applicant_name = checkedOutDialog.findViewById(R.id.name_title);
+        TextView description = checkedOutDialog.findViewById(R.id.desc_text);
+        MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
+
+        applicant_name.setText("Applicant " + applicantName);
+        message.setText(status);
+        description.setText("With Reference " + referenceNumber);
+
+
+        dismissButton.setOnClickListener(view -> {
+            if(Objects.equals(flag, 1)){
+                offlineDB.insertFailedCheckins(referenceNumber, applicantName, status, formatter.format(date));
+            } else {
+                offlineDB.insertFailedCheckins(referenceNumber, applicantName, status, formatter.format(date));
+            }
+            checkedOutDialog.dismiss();
+        });
+
+        checkedOutDialog.setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK);
+
+        checkedOutDialog.show();
+    }
+
+    // Method for verify Qr Code for searchCertificateReference
     private void searchCertificateReference(String data){
+        Log.e("INCOMING QR DATA FOR CHECKOUT", data);
+        searchDialog = ProgressDialog.show(HomeActivity.this, "Processing", "Please wait...");
+        JSONObject applicationData =  offlineDB.getApplication(Config.removeDoubleQuotes(data));
+
+        StringRequest request = new StringRequest(Request.Method.POST, Config.GET_APPLICANT,
+                response -> {
+                    searchDialog.dismiss();
+                    Log.e(Config.LOG_TAG, String.valueOf(response));
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONObject applicantResponse = jsonObject.getJSONObject("response");
+                        String code = applicantResponse.getString("code");
+                        String message = applicantResponse.getString("message");
+                        String application_status = applicationData.getString("application_status");
+
+                        if(code.equals("200")) {
+                            JSONArray applicantDetails = jsonObject.getJSONArray("data");
+                            System.out.println("Data " + applicantDetails);
+                            Log.e(Config.LOG_TAG, String.valueOf(applicantDetails));
+
+                            if(applicantDetails.length() > 0) {
+                                for(int i = 0; i < applicantDetails.length(); i++) {
+                                    JSONObject applicantObject = applicantDetails.getJSONObject(i);
+                                    applicantName = applicantObject.getString("applicant_name");
+                                    referenceNumber = applicantObject.getString("reference_number");
+                                    nationality = applicantObject.getString("nationality");
+                                    arrivalDate = applicantObject.getString("arrival_date");
+                                    passportNumber = applicantObject.getString("passport_number");
+                                    applicationStatus  = applicantObject.getString("application_status");
+                                }
+                                Bundle bundle = new Bundle();
+                                bundle.putString(Config.INCOMING_TAG, tag);
+                                bundle.putString("applicant_name", applicantName);
+                                bundle.putString("reference_number", referenceNumber);
+                                bundle.putString("nationality", nationality);
+                                bundle.putString("arrival_date", arrivalDate);
+                                bundle.putString("passport_number", passportNumber);
+                                bundle.putString("application_status", applicationStatus);
+
+                                if(application_status.equals("Depart")) {
+                                    showCheckedDialog(applicantName, referenceNumber, "Already scanned", 2);
+                                }else if(application_status.equals("New")) {
+                                    showCheckedDialog(applicantName, referenceNumber, "Has not yet scanned", 2);
+                                }else {
+                                    Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
+                                    intent.putExtras(bundle);
+                                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                }
+                            } else {
+                                showSnackBar("No record found for " + data);
+                            }
+                        } else {
+                            showSnackBar("Failed to get Applicant: " + message);
+                        }
+
+                    } catch (JSONException exception) {
+                        showSnackBar("Request Error: " + exception);
+                    }
+                },
+                error -> {
+                    showSnackBar("Request Error: " + error);
+                }) {
+            @NonNull
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("authorization", "Bearer " + authToken);
+                params.put("reference_number", Config.removeDoubleQuotes(data));
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded";
+            }
+        };
+        RequestQueue queue = Volley.newRequestQueue(this);
+        request.setRetryPolicy(new DefaultRetryPolicy(4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(request);
 
     }
+
 }
