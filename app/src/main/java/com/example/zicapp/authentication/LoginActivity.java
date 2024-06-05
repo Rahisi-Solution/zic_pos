@@ -42,13 +42,9 @@ public class LoginActivity extends AppCompatActivity {
     TextInputEditText officerNumber;
     TextInputEditText officerPIN;
 
-    String officer_number;
-
-    String officer_pin;
-
     boolean logged_in = false;
 
-    private final Context context = LoginActivity.this;
+    private final LoginActivity context = LoginActivity.this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

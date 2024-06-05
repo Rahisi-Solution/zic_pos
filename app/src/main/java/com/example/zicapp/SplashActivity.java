@@ -11,9 +11,6 @@ import com.example.zicapp.authentication.LoginActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
-
-    private final int SPLASH_DISPLAY_LENGTH = 3000;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,6 +19,8 @@ public class SplashActivity extends AppCompatActivity {
 
         Handler handler = new Handler();
 
+        // Start delay timer before go to login page
+        int SPLASH_DISPLAY_LENGTH = 3000;
         handler.postDelayed(() -> {
             Intent loginActivity = new Intent(SplashActivity.this, LoginActivity.class);
             startActivity(loginActivity);

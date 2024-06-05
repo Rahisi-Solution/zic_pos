@@ -26,4 +26,10 @@
     <string name="first_certificate">First Certificate</string>
     <string name="invalid_certificates">Invalid Certificates</string>
     <string name="last_certificate">Last Certificate</string>
+    <string name="nationality">Nationality</string>
+    <string name="arrival_date">Arrival Date</string>
+    <string name="reference_number">Reference Number</string>
+    <string name="passport_number">Passport Number</string>
+    <string name="applicant_travel_details">Applicant Travel Details</string>
+    <string name="mark_verified">Mark Verified</string>
 </resources>

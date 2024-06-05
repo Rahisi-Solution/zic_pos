@@ -2,6 +2,7 @@ package com.example.zicapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,6 +52,7 @@ public class ReportActivity extends AppCompatActivity {
 
     }
 
+    // Get first Certificate Reference Number
     public void getFirstCertificate() {
         JSONArray firstCheckin = offlineDB.getFirstCertificate();
 
@@ -65,6 +67,7 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 
+    // Get last Certificate Reference Number
     public void getLastCertificate() {
         JSONArray lastCheckin = offlineDB.getLastCertificate();
 
@@ -79,6 +82,7 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 
+    // When back button key is presses return to Home Screen
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(ReportActivity.this, HomeActivity.class);

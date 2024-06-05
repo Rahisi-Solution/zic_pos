@@ -7,6 +7,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -69,15 +70,17 @@ public class SettingsActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(SettingsActivity.this, SettingsActivity.class);
+                intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
                 String selectedLang = parent.getItemAtPosition(position).toString();
                 if (selectedLang.equals("English")){
                     setLocal(SettingsActivity.this, "en");
                     finish();
-                    startActivity(getIntent());
+                    startActivity(intent);
                 } else if (selectedLang.equals("Swahili")) {
                     setLocal(SettingsActivity.this, "sw");
                     finish();
-                    startActivity(getIntent());
+                    startActivity(intent);
                 }
             }
 
@@ -88,13 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         logoutButton.setOnClickListener(view -> {
-
-            SharedPreferences preferences = getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-            preferences.edit().clear().apply();
-            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
-            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            _showSignOutDialog();
         });
     }
 
@@ -104,6 +101,26 @@ public class SettingsActivity extends AppCompatActivity {
 
          entryPoint = preferences.getString(Config.ENTRYPOINT, "n.a");
 
+    }
+
+    private void _showSignOutDialog() {
+        AlertDialog.Builder _dialog = new AlertDialog.Builder(this);
+        _dialog.setTitle("Are You Sure?");
+        _dialog.setMessage("Do you want to logout?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    SharedPreferences preferences = SettingsActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+                    preferences.edit().clear().apply();
+                    Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+
+                });
+        AlertDialog signOut =  _dialog.create();
+        signOut.show();
     }
 
     public void setLocal(Activity activity, String langCode){

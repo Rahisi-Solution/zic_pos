@@ -28,10 +28,11 @@ public class OfflineDB extends SQLiteOpenHelper {
     String scanned_certificate;
     String failed_certificate;
 
+    // Creating Tables in offline database (SQLite)
     scanned_certificate =  "CREATE TABLE scanned_certificate (reference_number TEXT, date TEXT, time TEXT)";
     failed_certificate =  "CREATE TABLE failed_certificate (reference_number TEXT, date TEXT, time TEXT)";
 
-
+    // Executing query to Create Table in offline database (SQLite)
     sqLiteDatabase.execSQL(scanned_certificate);
     sqLiteDatabase.execSQL(failed_certificate);
 
@@ -39,13 +40,17 @@ public class OfflineDB extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+
+        // Drop Table on the Database Upgrade
         String scannedCertificates = "DROP TABLE IF EXISTS scanned_certificate";
         String failedCertificate = "DROP TABLE IF EXISTS failed_certificate";
 
+        // Executing Drop Table Queries
         sqLiteDatabase.execSQL(scannedCertificates);
         sqLiteDatabase.execSQL(failedCertificate);
     }
 
+    // Inserting Valid Certificate in scanned_certificate Table
     public void insertCertificate(String reference_number, String date, String time){
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -63,6 +68,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         database.close();
     }
 
+    // Inserting Invalid Certificate in failed_certificate Table
     public void insertInvalidCertificate(String reference_number, String date, String time){
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -80,6 +86,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         database.close();
     }
 
+    // Calculating Total Valid Certificates
     public int totalCertificates() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date today = new Date();
@@ -91,6 +98,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         return count;
     }
 
+    // Calculating Total Invalid Certificates
     public int totalInvalidCertificates() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date today = new Date();
@@ -102,6 +110,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         return count;
     }
 
+    // Computing Reference Number of the First Scanned Certificate
     public JSONArray getFirstCertificate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date today = new Date();
@@ -137,6 +146,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         return firstCertificate;
     }
 
+    // Computing Reference Number of the Last Scanned Certificate
     public JSONArray getLastCertificate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date today = new Date();

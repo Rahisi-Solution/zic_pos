@@ -8,7 +8,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +16,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -34,7 +33,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
     OfflineDB offlineDB = new OfflineDB(HomeActivity.this);
@@ -45,7 +43,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private String username;
     private String entrypoint;
-    private String authToken;
     int total_certificates;
 
     View parentLayout;
@@ -64,7 +61,7 @@ public class HomeActivity extends AppCompatActivity {
 
         prepareData();
         parentLayout = findViewById(android.R.id.content);
-        total_certificates=offlineDB.totalCertificates();
+        total_certificates = offlineDB.totalCertificates();
 
         user_name = findViewById(R.id.officer_name);
         entry_point = findViewById(R.id.entry_point);
@@ -86,6 +83,7 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Navigate to report page to see daily report 
         reports.setOnClickListener(view -> {
             Intent intent = new Intent(HomeActivity.this, ReportActivity.class);
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
@@ -107,14 +105,8 @@ public class HomeActivity extends AppCompatActivity {
     // Prepare Data for Home Page Display
     private void prepareData() {
         SharedPreferences preferences = HomeActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-
-        authToken = preferences.getString(Config.AUTH_TOKEN, "n.a");
         username = preferences.getString(Config.USER_NAME, "n.a");
         entrypoint = preferences.getString(Config.ENTRYPOINT, "n.a");
-
-        System.out.println("User Logged In = " + username);
-
-
     }
 
     // Check the Package for Launching QR Code
@@ -190,7 +182,7 @@ public class HomeActivity extends AppCompatActivity {
         checkedOutDialog.show();
     }
 
-    // Error dialog to show when scan certificate failed //
+    /* Error dialog to show when scan certificate failed */
     private void showErrorDialog() {
         checkedOutDialog = new Dialog(this);
         checkedOutDialog.setCanceledOnTouchOutside(false);
@@ -218,5 +210,9 @@ public class HomeActivity extends AppCompatActivity {
         });
         checkedOutDialog.setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK);
         checkedOutDialog.show();
+    }
+
+    private void searchCertificateReference(String data){
+
     }
 }

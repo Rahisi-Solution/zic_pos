@@ -27,4 +27,8 @@
     <string name="first_certificate">Cheti cha Kwanza</string>
     <string name="invalid_certificates">Vyeti Batili</string>
     <string name="last_certificate">Cheti cha Mwisho</string>
+    <string name="nationality">Nationality</string>
+    <string name="arrival_date">Arrival Date</string>
+    <string name="applicant_travel_details">Applicant Travel Details</string>
+    <string name="mark_verified">Mark Verified</string>
 </resources>
