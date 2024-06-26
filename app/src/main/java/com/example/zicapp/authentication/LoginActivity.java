@@ -24,6 +24,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.zicapp.HomeActivity;
 import com.example.zicapp.R;
 import com.example.zicapp.utils.Config;
+import com.example.zicapp.utils.OfflineDB;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -36,7 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
-
+    OfflineDB offlineDB = new OfflineDB(LoginActivity.this);
     View parentLayout;
     private ProgressDialog loginProgress;
     TextInputEditText officerNumber;
@@ -52,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         MaterialButton loginButton = findViewById(R.id.login_button);
+        MaterialButton resetButton = findViewById(R.id.reset_button);
         officerNumber = findViewById(R.id.officer_number_field);
         officerPIN = findViewById(R.id.officer_pin_field);
         parentLayout = findViewById(android.R.id.content);
@@ -74,6 +76,11 @@ public class LoginActivity extends AppCompatActivity {
                 loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
             }
             return false;
+        });
+
+        resetButton.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ResetPasswordActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -99,40 +106,46 @@ public class LoginActivity extends AppCompatActivity {
                         String code = officerResponse.getString("code");
                         String message = officerResponse.getString("message");
 
-                        if(code.equals("200")) {
+                        if(code.equals("200")){
                             JSONObject userDetails = jsonObject.getJSONObject("user_details");
-                            String auth_token = userDetails.getString("token");
-                            String login_credential = userDetails.getString("login_credential_id");
-                            String user_id = userDetails.getString("user_id");
-                            String user_name = userDetails.getString("username");
-                            String domain = userDetails.getString("domain");
-                            String entrypoint_id = userDetails.getString("entrypoint_id");
-                            String entrypoint = userDetails.getString("entrypoint");
-                            JSONArray applications = userDetails.getJSONArray("applications");
+                            String inspectorType = userDetails.getString("inspector_type");
 
-                            Log.e("APPLICATIONS", String.valueOf(applications));
+                            if(inspectorType.equals("2")) {
+                                String auth_token = userDetails.getString("token");
+                                String login_credential = userDetails.getString("login_credential_id");
+                                String user_id = userDetails.getString("user_id");
+                                String user_name = userDetails.getString("username");
+                                String domain = userDetails.getString("domain");
+                                String entrypoint_id = userDetails.getString("entrypoint_id");
+                                String entrypoint = userDetails.getString("entrypoint");
+                                JSONArray applications = userDetails.getJSONArray("applications");
 
-                            saveApplications(applications);
+                                Log.e("APPLICATIONS", String.valueOf(applications));
 
-                            SharedPreferences preferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = preferences.edit();
+                                saveApplications(applications);
 
-                            editor.putString(Config.AUTH_TOKEN, auth_token);
-                            editor.putString(Config.LOGIN_CREDENTIAL, login_credential);
-                            editor.putString(Config.USER_ID, user_id);
-                            editor.putString(Config.USER_NAME, user_name);
-                            editor.putString(Config.DOMAIN, domain);
-                            editor.putString(Config.ENTRYPOINT_ID, entrypoint_id);
-                            editor.putString(Config.ENTRYPOINT, entrypoint);
-                            editor.putBoolean(Config.LOGGED_IN_PREF, true);
-                            editor.apply();
+                                SharedPreferences preferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
 
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                            startActivity(intent);
-                            finish();
+                                editor.putString(Config.AUTH_TOKEN, auth_token);
+                                editor.putString(Config.LOGIN_CREDENTIAL, login_credential);
+                                editor.putString(Config.USER_ID, user_id);
+                                editor.putString(Config.USER_NAME, user_name);
+                                editor.putString(Config.DOMAIN, domain);
+                                editor.putString(Config.ENTRYPOINT_ID, entrypoint_id);
+                                editor.putString(Config.ENTRYPOINT, entrypoint);
+                                editor.putBoolean(Config.LOGGED_IN_PREF, true);
+                                editor.apply();
 
+                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+
+                            } else {
+                                showSnackBar("Error: Officer does not registered under this Institution" + "");
+                            }
                         } else {
-                            showSnackBar("Something happened: "+ message);
+                            showSnackBar("Something happened " + message);
                         }
 
                     } catch (JSONException exception) {
@@ -179,10 +192,6 @@ public class LoginActivity extends AppCompatActivity {
                     String nationality = applicationObject.getString("nationality");
                     String arrivalDate = applicationObject.getString("arrival_date");
                     String passportNumber = applicationObject.getString("passport_number");
-
-                    String travelMode = applicationObject.getString("travel_mode");
-                    String flightVessel = applicationObject.getString("flight_vessel");
-                    String stayDuration = applicationObject.getString("stay_duration");
                     String applicationStatus = applicationObject.getString("application_status");
 
                     JSONObject _applicationObject = new JSONObject();
@@ -191,13 +200,10 @@ public class LoginActivity extends AppCompatActivity {
                     _applicationObject.put("nationality", nationality);
                     _applicationObject.put("arrival_date",  arrivalDate);
                     _applicationObject.put("passport_number", passportNumber);
-                    _applicationObject.put("travel_mode", travelMode);
-                    _applicationObject.put("flight_vessel", flightVessel);
-                    _applicationObject.put("stay_duration", stayDuration);
                     _applicationObject.put("application_status", applicationStatus);
 
                     Log.e("Inserted Applications", String.valueOf(_applicationObject));
-//                    offlineDB.insertApplications(_applicationObject);
+                    offlineDB.insertApplications(_applicationObject);
 
                 } catch (JSONException exception) {
                     Log.e("APPLICATIONS LOOP", String.valueOf(exception));
@@ -205,19 +211,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     }
-
-//    @Override
-//    public void onClick(View view) {
-//        if(String.valueOf(officerNumber.getText()).trim().isEmpty()) {
-//            showSnackBar("Please Enter Officer Number");
-//            Log.e(Config.LOG_TAG, "Enter number");
-//        } else if (String.valueOf(officerPIN.getText()).trim().isEmpty()) {
-//            showSnackBar("Please Enter Officer PIN");
-//            Log.e(Config.LOG_TAG, "Enter pin");
-//        } else {
-//            loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
-//        }
-//    }
 
     void showSnackBar(String displayMessage) {
         Snackbar snackbar;
@@ -241,7 +234,8 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         } else {
-            showSnackBar("Logged in status: FALSE");
+            System.out.println("Login False");
+//            showSnackBar("Logged in status: FALSE");
         }
     }
 

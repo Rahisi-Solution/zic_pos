@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -28,16 +29,19 @@ public class OfflineDB extends SQLiteOpenHelper {
     String scanned_certificate;
     String failed_certificate;
     String checked_in;
+        String applications;
 
-    // Creating Tables in offline database (SQLite)
+        // Creating Tables in offline database (SQLite)
     scanned_certificate =  "CREATE TABLE scanned_certificate (reference_number TEXT, date TEXT, time TEXT)";
     failed_certificate =  "CREATE TABLE failed_certificate (reference_number TEXT, date TEXT, time TEXT)";
     checked_in = "CREATE TABLE checked_in (reference_number TEXT, name TEXT, checkins TEXT, date TEXT)";
+    applications = "CREATE TABLE applications (reference_number TEXT, name TEXT, nationality TEXT, arrival_date TEXT, passport_number TEXT, application_status TEXT)";
 
     // Executing query to Create Table in offline database (SQLite)
     sqLiteDatabase.execSQL(scanned_certificate);
     sqLiteDatabase.execSQL(failed_certificate);
     sqLiteDatabase.execSQL(checked_in);
+    sqLiteDatabase.execSQL(applications);
 
     }
 
@@ -48,12 +52,35 @@ public class OfflineDB extends SQLiteOpenHelper {
         String scannedCertificates = "DROP TABLE IF EXISTS scanned_certificate";
         String failedCertificate = "DROP TABLE IF EXISTS failed_certificate";
         String checked_in = "DROP TABLE IF EXISTS checked_in";
+        String applications = "DROP TABLE IF EXISTS applications";
 
         // Executing Drop Table Queries
         sqLiteDatabase.execSQL(scannedCertificates);
         sqLiteDatabase.execSQL(failedCertificate);
         sqLiteDatabase.execSQL(checked_in);
+        sqLiteDatabase.execSQL(applications);
     }
+
+    public void insertApplications(JSONObject jsonObject) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        try {
+            values.put("reference_number", jsonObject.getString("reference_number"));
+            values.put("name", jsonObject.getString("name"));
+            values.put("nationality", jsonObject.getString("nationality"));
+            values.put("arrival_date", jsonObject.getString("arrival_date"));
+            values.put("passport_number", jsonObject.getString("passport_number"));
+            values.put("application_status", jsonObject.getString("application_status"));
+        } catch (JSONException exception) {
+            exception.printStackTrace();
+        }
+
+        database.insert("applications", null, values);
+        database.close();
+
+    }
+
 
     // Inserting Valid Certificate in scanned_certificate Table
     public void insertCertificate(String reference_number, String date, String time){

@@ -17,6 +17,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -32,7 +34,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.zicapp.utils.Config;
+import com.example.zicapp.utils.OfflineCertificatesRequest;
 import com.example.zicapp.utils.OfflineDB;
+import com.example.zicapp.utils.RequestDAO;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
@@ -75,11 +79,18 @@ public class HomeActivity extends AppCompatActivity {
     SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
     private String tag;
 
+    private RequestDAO requestDAO;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_home);
+
+        requestDAO = new RequestDAO(this);
+        requestDAO.open();
+
+        syncCertificatesOfflineRequest();
 
         prepareData();
         parentLayout = findViewById(android.R.id.content);
@@ -124,11 +135,24 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    // Check Device internet connectivity
+    public static boolean isOnline(Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
+
+        if(connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnected();
+        } else {
+            return false;
+        }
+    }
+
     // Prepare Data for Home Page Display
     private void prepareData() {
         SharedPreferences preferences = HomeActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         username = preferences.getString(Config.USER_NAME, "n.a");
         entrypoint = preferences.getString(Config.ENTRYPOINT, "n.a");
+        authToken = preferences.getString(Config.AUTH_TOKEN, "n.a");
     }
 
     // Check the Package for Launching QR Code
@@ -153,10 +177,15 @@ public class HomeActivity extends AppCompatActivity {
                         String data = result.getData().getStringExtra("qrCode");
                         System.out.println("Qr Code data = " + data);
                         assert data != null;
-                        if(data.startsWith("https://")){
-                            showSuccessDialog();
+                        String passedData = Config.removeDoubleQuotes(data);
+                        if(passedData.startsWith("IA")){
+                            if(isOnline(this)){
+                                searchCertificateReference(data);
+                            } else {
+                                searchCertificateReferenceOffline(data);
+                            }
                         } else {
-                            showErrorDialog();
+                            showSnackBar("Invalid Qr Code");
                         }
                     }
                 }
@@ -174,35 +203,6 @@ public class HomeActivity extends AppCompatActivity {
         snackbar.show();
     }
 
-    // Success dialog to show when scan certificate success //
-    private void showSuccessDialog() {
-        checkedOutDialog = new Dialog(this);
-        checkedOutDialog.setCanceledOnTouchOutside(false);
-        checkedOutDialog.setContentView(R.layout.success_dialog);
-
-        TextView message = checkedOutDialog.findViewById(R.id.message_title);
-        TextView applicant_name = checkedOutDialog.findViewById(R.id.name_title);
-        TextView description = checkedOutDialog.findViewById(R.id.desc_text);
-        MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
-
-        message.setText("Valid Certificate");
-        applicant_name.setText("Verification Successfully");
-        description.setText("Welcome to Zanzibar");
-
-        String scannedDate = dateFormatter.format(date);
-        String scannedTime = timeFormatter.format(date);
-        String referenceNumber = "CT-1200" + scannedTime;
-        offlineDB.insertCertificate(referenceNumber, scannedDate, scannedTime);
-        dismissButton.setOnClickListener(view -> {
-            checkedOutDialog.dismiss();
-            showSnackBar("👊👊 Welcome to Zanzibar");
-            Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
-            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
-        checkedOutDialog.setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK);
-        checkedOutDialog.show();
-    }
 
     /* Error dialog to show when scan certificate failed */
     private void showErrorDialog() {
@@ -266,9 +266,7 @@ public class HomeActivity extends AppCompatActivity {
 
     // Method for verify Qr Code for searchCertificateReference
     private void searchCertificateReference(String data){
-        Log.e("INCOMING QR DATA FOR CHECKOUT", data);
         searchDialog = ProgressDialog.show(HomeActivity.this, "Processing", "Please wait...");
-        JSONObject applicationData =  offlineDB.getApplication(Config.removeDoubleQuotes(data));
 
         StringRequest request = new StringRequest(Request.Method.POST, Config.GET_APPLICANT,
                 response -> {
@@ -277,47 +275,34 @@ public class HomeActivity extends AppCompatActivity {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONObject applicantResponse = jsonObject.getJSONObject("response");
+                        JSONObject applicantData = jsonObject.getJSONObject("data");
                         String code = applicantResponse.getString("code");
                         String message = applicantResponse.getString("message");
-                        String application_status = applicationData.getString("application_status");
+                        System.out.println("Data after scan " + applicantData);
 
                         if(code.equals("200")) {
-                            JSONArray applicantDetails = jsonObject.getJSONArray("data");
-                            System.out.println("Data " + applicantDetails);
-                            Log.e(Config.LOG_TAG, String.valueOf(applicantDetails));
+                            Log.e(Config.LOG_TAG, String.valueOf(applicantData));
 
-                            if(applicantDetails.length() > 0) {
-                                for(int i = 0; i < applicantDetails.length(); i++) {
-                                    JSONObject applicantObject = applicantDetails.getJSONObject(i);
-                                    applicantName = applicantObject.getString("applicant_name");
-                                    referenceNumber = applicantObject.getString("reference_number");
-                                    nationality = applicantObject.getString("nationality");
-                                    arrivalDate = applicantObject.getString("arrival_date");
-                                    passportNumber = applicantObject.getString("passport_number");
-                                    applicationStatus  = applicantObject.getString("application_status");
-                                }
-                                Bundle bundle = new Bundle();
-                                bundle.putString(Config.INCOMING_TAG, tag);
-                                bundle.putString("applicant_name", applicantName);
-                                bundle.putString("reference_number", referenceNumber);
-                                bundle.putString("nationality", nationality);
-                                bundle.putString("arrival_date", arrivalDate);
-                                bundle.putString("passport_number", passportNumber);
-                                bundle.putString("application_status", applicationStatus);
+                            applicantName = applicantData.getString("name");
+                            referenceNumber = applicantData.getString("reference_number");
+                            nationality = applicantData.getString("nationality");
+                            arrivalDate = applicantData.getString("arrival_date");
+                            passportNumber = applicantData.getString("passport_number");
+                            applicationStatus  = applicantData.getString("application_status");
 
-                                if(application_status.equals("Depart")) {
-                                    showCheckedDialog(applicantName, referenceNumber, "Already scanned", 2);
-                                }else if(application_status.equals("New")) {
-                                    showCheckedDialog(applicantName, referenceNumber, "Has not yet scanned", 2);
-                                }else {
-                                    Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
-                                    intent.putExtras(bundle);
-                                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(intent);
-                                }
-                            } else {
-                                showSnackBar("No record found for " + data);
-                            }
+                            Bundle bundle = new Bundle();
+                            bundle.putString(Config.INCOMING_TAG, tag);
+                            bundle.putString("applicant_name", applicantName);
+                            bundle.putString("reference_number", referenceNumber);
+                            bundle.putString("nationality", nationality);
+                            bundle.putString("arrival_date", arrivalDate);
+                            bundle.putString("passport_number", passportNumber);
+                            bundle.putString("application_status", applicationStatus);
+
+                            Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
+                            intent.putExtras(bundle);
+                            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
                         } else {
                             showSnackBar("Failed to get Applicant: " + message);
                         }
@@ -347,6 +332,98 @@ public class HomeActivity extends AppCompatActivity {
         request.setRetryPolicy(new DefaultRetryPolicy(4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
 
+    }
+
+    private void searchCertificateReferenceOffline(String data) {
+        JSONObject applicationData =  offlineDB.getApplication(Config.removeDoubleQuotes(data));
+        try {
+            String name = applicationData.getString("name");
+            String reference_number = applicationData.getString("reference_number");
+            String nationality = applicationData.getString("nationality");
+            String arrival_date = applicationData.getString("arrival_date");
+            String passport_number = applicationData.getString("passport_number");
+            String application_status = applicationData.getString("application_status");
+
+            Bundle bundle = new Bundle();
+            bundle.putString(Config.INCOMING_TAG, tag);
+            bundle.putString("name", name);
+            bundle.putString("reference_number", reference_number);
+            bundle.putString("nationality", nationality);
+            bundle.putString("arrival_date",arrival_date);
+            bundle.putString("passport_number", passport_number);
+            bundle.putString("application_status", application_status);
+
+                Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
+                intent.putExtras(bundle);
+                intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+
+
+
+        } catch (JSONException exception) {
+            Log.e("Error", exception.getMessage());
+        }
+    }
+
+    private void syncCertificatesOfflineRequest() {
+        if(isOnline(this)){
+            List<OfflineCertificatesRequest> requests = requestDAO.getAllRequests();
+            for(OfflineCertificatesRequest request : requests ) {
+                 sendCertificatesOfflineRequest(request);
+            }
+        }
+    }
+
+    // Request to send data to API when device comes ONLINE
+    private void sendCertificatesOfflineRequest(OfflineCertificatesRequest request) {
+        StringRequest certificateRequest = new StringRequest(Request.Method.POST, Config.MARK_IN_USE,
+                response -> {
+                    System.out.println("Request = " + request);
+                   Log.e("CERTIFICATE RESPONSE: ", String.valueOf(response));
+                   try{
+                       JSONObject jsonObject = new JSONObject(String.valueOf(response));
+                       JSONObject certificateResponse = jsonObject.getJSONObject("response");
+                       String code = certificateResponse.getString("code");
+                       String message =certificateResponse.getString("message");
+
+                       if(code.equals("200")){
+                           JSONObject certificateDetails = jsonObject.getJSONObject("data");
+
+                           Log.e("CERTIFICATE OFFLINE DETAILS: ", String.valueOf(certificateDetails));
+                           requestDAO.deleteRequest(request.getId());
+                           System.out.println("DATA SENT OFFLINE SUCCESSFULLY");
+                       }else {
+                           Log.e("", message);
+                       }
+
+                   }catch(JSONException e){
+                       Log.e("Certificate response Error ", String.valueOf(e));
+                       showSnackBar("Certificate response Error" + e);
+                   }
+                },
+                error -> {
+                       Log.e("", String.valueOf(error));
+                       showSnackBar("" + error);
+                }
+                ){
+                   @NonNull
+                   @Override
+                   protected Map<String, String> getParams() {
+                       Map<String, String> params = new HashMap<>();
+                       params.put("authorization", "Bearer " + request.getAuthToken());
+                       params.put("reference_number", request.getReferenceNumber());
+                       System.out.println("Parameters to put from offline " + params);
+                       return params;
+                   }
+
+                   @Override
+                   public String getBodyContentType() {
+                       return "application/x-www-form-urlencoded";
+                   }
+        };
+        RequestQueue queue = Volley.newRequestQueue(this);
+        certificateRequest.setRetryPolicy(new DefaultRetryPolicy (4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(certificateRequest);
     }
 
 }

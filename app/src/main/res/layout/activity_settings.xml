@@ -103,6 +103,22 @@
 
     </GridLayout>
 
+    <TextView
+        android:id="@+id/change_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:fontFamily="@font/rubik_regular"
+        android:onClick="onChangePassword"
+        android:text="@string/change_password"
+        android:textSize="19sp"
+        app:layout_constraintBottom_toTopOf="@+id/logout_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.037"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sample_language"
+        app:layout_constraintVertical_bias="0.093" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logout_button"
         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ZIC App</string>
     <string name="welcome">Welcome</string>
@@ -27,9 +28,14 @@
     <string name="invalid_certificates">Invalid Certificates</string>
     <string name="last_certificate">Last Certificate</string>
     <string name="nationality">Nationality</string>
-    <string name="arrival_date">Arrival Date</string>
+    <string name="arrival_date">Insurance Start Date</string>
     <string name="reference_number">Reference Number</string>
     <string name="passport_number">Passport Number</string>
     <string name="applicant_travel_details">Applicant Travel Details</string>
     <string name="mark_verified">Mark Verified</string>
+    <string name="change_password">Change Password</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="old_password">Old Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>

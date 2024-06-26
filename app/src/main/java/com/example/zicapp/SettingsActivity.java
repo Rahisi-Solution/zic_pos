@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.zicapp.authentication.ChangePassword;
 import com.example.zicapp.authentication.LoginActivity;
 import com.example.zicapp.utils.Config;
 import com.google.android.material.button.MaterialButton;
@@ -34,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     MaterialButton logoutButton;
     Spinner spinner;
     private  String entryPoint;
+    TextView change_password;
 
     SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
     Date date = new Date();
@@ -51,6 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
         TextView today_date = findViewById(R.id.today_date);
         spinner = findViewById(R.id.spinner_sample);
         TextView entry_point = findViewById(R.id.entry_point);
+        change_password = findViewById(R.id.change_password);
 
         entry_point.setText(entryPoint);
 
@@ -140,4 +143,10 @@ public class SettingsActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    public void onChangePassword(View view) {
+        Intent intent = new Intent(SettingsActivity.this, ChangePassword.class);
+        intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
 }

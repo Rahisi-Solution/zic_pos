@@ -27,8 +27,15 @@
     <string name="first_certificate">Cheti cha Kwanza</string>
     <string name="invalid_certificates">Vyeti Batili</string>
     <string name="last_certificate">Cheti cha Mwisho</string>
-    <string name="nationality">Nationality</string>
-    <string name="arrival_date">Arrival Date</string>
-    <string name="applicant_travel_details">Applicant Travel Details</string>
-    <string name="mark_verified">Mark Verified</string>
+    <string name="nationality">Utaifa</string>
+    <string name="arrival_date">Tarehe ya Kuanza Bima</string>
+    <string name="applicant_travel_details">Maelezo ya Safari ya Mwombaji</string>
+    <string name="mark_verified">Thibitisha Bima</string>
+    <string name="reference_number">Numbari ya Kumbukumbu</string>
+    <string name="passport_number">Nambari ya Pasipoti</string>
+    <string name="change_password">Badili Nenosiri</string>
+    <string name="reset_password">Tengua Nenosiri</string>
+    <string name="old_password">Nenosiri la zamani</string>
+    <string name="new_password">Nenosiri Jipya</string>
+    <string name="confirm_password">Thibitisha Nenosiri</string>
 </resources>
