@@ -8,6 +8,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -66,14 +68,32 @@ public class LoginActivity extends AppCompatActivity {
                 showSnackBar("Please Enter Officer PIN");
                 Log.e(Config.LOG_TAG, "Enter pin");
             } else {
-                loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
+                if(isOnline(this)){
+                    loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
+                } else {
+                    showSnackBar("You are offline, please connect to internet to continue");
+                }
+
             }
         });
 
         officerPIN.setOnKeyListener((view, keyCode, event) -> {
             if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 hideOnScreenKeyboard();
-                loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
+                if(String.valueOf(officerNumber.getText()).trim().isEmpty()) {
+                    showSnackBar("Please Enter Officer Number");
+                    Log.e(Config.LOG_TAG, "Enter number");
+                } else if (String.valueOf(officerPIN.getText()).trim().isEmpty()) {
+                    showSnackBar("Please Enter Officer PIN");
+                    Log.e(Config.LOG_TAG, "Enter pin");
+                } else {
+                    if(isOnline(this)){
+                        loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
+                    } else {
+                        showSnackBar("You are offline, please connect to internet to continue");
+                    }
+
+                }
             }
             return false;
         });
@@ -82,6 +102,18 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, ResetPasswordActivity.class);
             startActivity(intent);
         });
+    }
+
+    // Check Device internet connectivity
+    public static boolean isOnline(Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+
+        if(connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnected();
+        } else {
+            return false;
+        }
     }
 
     private void hideOnScreenKeyboard() {
@@ -155,7 +187,12 @@ public class LoginActivity extends AppCompatActivity {
                 error -> {
                     loginProgress.dismiss();
                     try {
-                        showSnackBar(String.valueOf(error));
+                        if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
+                            System.out.println("The error HERE = " + error);
+                            showSnackBar("Network Error please check your Internet Bandwith");
+                        } else {
+                            showSnackBar(String.valueOf(error));
+                        }
                     } catch (Exception e) {
                         showSnackBar("unknown error: " + e);
                     }

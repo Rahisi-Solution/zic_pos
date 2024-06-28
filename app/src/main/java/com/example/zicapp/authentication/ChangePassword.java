@@ -106,12 +106,14 @@ public class ChangePassword extends AppCompatActivity {
         }
     }
 
+    // Prepare data from preferences
     private void prepareData(){
         SharedPreferences preferences = ChangePassword.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         authToken = preferences.getString(Config.AUTH_TOKEN, "n.a");
         System.out.println("Token " + authToken);
     }
 
+    // Change PIN function
     private void changePin(String oldPassword, String newPassword, String confirmPassword){
         searchDialog = ProgressDialog.show(ChangePassword.this, "Processing", "Please wait...");
 
@@ -136,7 +138,13 @@ public class ChangePassword extends AppCompatActivity {
                     }
                 },
                 error -> {
-                    showSnackBar("Request Error: " + error);
+                    searchDialog.dismiss();
+                    if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
+                        System.out.println("The error HERE = " + error);
+                        showSnackBar("Network Error please check your Internet Bandwith");
+                    } else {
+                        showSnackBar(String.valueOf(error));
+                    }
                 }) {
             @NonNull
             @Override
@@ -161,6 +169,7 @@ public class ChangePassword extends AppCompatActivity {
 
     }
 
+    // Snack bar for displaying message
     void showSnackBar(String displayMessage) {
         Snackbar snackbar;
         snackbar = Snackbar.make(parentLayout, displayMessage, Snackbar.LENGTH_SHORT);
@@ -171,6 +180,7 @@ public class ChangePassword extends AppCompatActivity {
         snackbar.show();
     }
 
+    // Success Dialog
     private void showSuccessDialog(String displayMessage) {
         checkedOutDialog = new Dialog(this);
         checkedOutDialog.setCanceledOnTouchOutside(false);

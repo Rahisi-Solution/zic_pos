@@ -141,7 +141,13 @@ public class ResultActivity extends AppCompatActivity {
                     }
                 },
                 error -> {
-//                    showSnackBar("Request Error: " + error);
+                   searchDialog.dismiss();
+                    if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
+                        System.out.println("The error HERE = " + error);
+                        showSnackBar("Network Error please check your Internet Bandwith");
+                    } else {
+                        showSnackBar(String.valueOf(error));
+                    }
                 }) {
             @NonNull
             @Override
