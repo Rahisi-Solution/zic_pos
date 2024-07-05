@@ -367,6 +367,7 @@ public class HomeActivity extends AppCompatActivity {
 
         } catch (JSONException exception) {
             Log.e("Error", exception.getMessage());
+            showSnackBar("Invalid Qr code");
         }
     }
 
