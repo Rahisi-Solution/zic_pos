@@ -246,6 +246,37 @@ public class OfflineDB extends SQLiteOpenHelper {
         return applicationObject;
     }
 
+    public JSONObject getCertificate(String reference_number) {
+        String query = "SELECT * FROM scanned_certificate WHERE reference_number='" + reference_number +"'";
+        SQLiteDatabase database = this.getWritableDatabase();
+        Cursor cursor = database.rawQuery(query, null);
+        JSONObject applicationObject = new JSONObject();
+
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            int totalColumn = cursor.getColumnCount();
+
+            for (int i = 0; i < totalColumn; i++) {
+                if (cursor.getColumnName(i) != null) {
+                    try {
+                        if(cursor.getString(i) != null) {
+                            applicationObject.put(cursor.getColumnName(i), cursor.getString(i));
+                        } else {
+                            applicationObject.put(cursor.getColumnName(i), "");
+                        }
+                    } catch (Exception exception) {
+                        Log.e("Error", Objects.requireNonNull(exception.getMessage()));
+                    }
+                }
+            }
+            cursor.moveToNext();
+        }
+        cursor.close();
+        Log.e("Got Certificate", String.valueOf(applicationObject));
+        return applicationObject;
+    }
+
     // Inserting Insert Failed Certificate Table
     public void insertFailedCheckins(String reference_number, String applicant_name, String status, String date) {
         SQLiteDatabase database = this.getWritableDatabase();

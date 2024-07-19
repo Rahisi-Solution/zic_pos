@@ -201,7 +201,7 @@ public class ResultActivity extends AppCompatActivity {
 
         String scannedDate = dateFormatter.format(date);
         String scannedTime = timeFormatter.format(date);
-        offlineDB.insertCertificate(checkinReference, scannedDate, scannedTime);
+        offlineDB.insertCertificate(referenceNumber, scannedDate, scannedTime);
         dismissButton.setOnClickListener(view -> {
             checkedOutDialog.dismiss();
             Intent intent = new Intent(ResultActivity.this, HomeActivity.class);

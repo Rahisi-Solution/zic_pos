@@ -178,11 +178,33 @@ public class HomeActivity extends AppCompatActivity {
                         System.out.println("Qr Code data = " + data);
                         assert data != null;
                         String passedData = Config.removeDoubleQuotes(data);
-                        if(passedData.startsWith("IA")){
-                            if(isOnline(this)){
-                                searchCertificateReference(data);
+                        if(passedData.startsWith("IA") || passedData.startsWith("ZIC")){
+                            JSONObject applicationData =  offlineDB.getCertificate(Config.removeDoubleQuotes(data));
+                            System.out.println("Offline certificate " + applicationData);
+                            if(applicationData.length() == 0){
+                                System.out.println("DATA IS EMPTY");
+                                if(isOnline(this)){
+                                    searchCertificateReference(data);
+                                } else {
+                                    searchCertificateReferenceOffline(data);
+                                }
                             } else {
-                                searchCertificateReferenceOffline(data);
+                                try {
+                                    String dateScanned = applicationData.getString("date");
+                                    String todayDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                                    System.out.println("Date scanned: " + dateScanned + " " + todayDate);
+                                    if(dateScanned.equals(todayDate)){
+                                        showErrorDialog();
+                                    } else {
+                                        if(isOnline(this)){
+                                            searchCertificateReference(data);
+                                        } else {
+                                            searchCertificateReferenceOffline(data);
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                         } else {
                             showSnackBar("Invalid Qr Code");
@@ -215,9 +237,9 @@ public class HomeActivity extends AppCompatActivity {
         TextView description = checkedOutDialog.findViewById(R.id.desc_text);
         MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
 
-        message.setText("Invalid Certificate");
-        applicant_name.setText("Verification Failed");
-        description.setText("Please Apply  for valid ZIC Insurance");
+        message.setText("Verification Failed");
+        applicant_name.setText("Error");
+        description.setText("Applicant already checked in today");
 
         String scannedDate = dateFormatter.format(date);
         String scannedTime = timeFormatter.format(date);
@@ -278,7 +300,7 @@ public class HomeActivity extends AppCompatActivity {
                         JSONObject applicantData = jsonObject.getJSONObject("data");
                         String code = applicantResponse.getString("code");
                         String message = applicantResponse.getString("message");
-                        System.out.println("Data after scan " + applicantData);
+                        System.out.println("Response Data " + applicantData);
 
                         if(code.equals("200")) {
                             Log.e(Config.LOG_TAG, String.valueOf(applicantData));
