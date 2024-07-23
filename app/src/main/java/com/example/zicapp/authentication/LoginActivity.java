@@ -223,13 +223,13 @@ public class LoginActivity extends AppCompatActivity {
             for (int i = 0; i < applications.length(); i++) {
                 try {
                     JSONObject applicationObject = applications.getJSONObject(i);
-
                     String name = applicationObject.getString("name");
                     String referenceNumber = applicationObject.getString("reference_number");
                     String nationality = applicationObject.getString("nationality");
                     String arrivalDate = applicationObject.getString("arrival_date");
                     String passportNumber = applicationObject.getString("passport_number");
-                    String applicationStatus = applicationObject.getString("application_status");
+                    String applicationStatus = applicationObject.getString("insuarance_status");
+//                    String insuranceStatus = applicationObject.getString("application_status");
 
                     JSONObject _applicationObject = new JSONObject();
                     _applicationObject.put("name", name);

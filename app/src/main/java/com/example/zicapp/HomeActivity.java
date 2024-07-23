@@ -194,7 +194,7 @@ public class HomeActivity extends AppCompatActivity {
                                     String todayDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                                     System.out.println("Date scanned: " + dateScanned + " " + todayDate);
                                     if(dateScanned.equals(todayDate)){
-                                        showErrorDialog();
+                                        showErrorDialog("Applicant already checked in today");
                                     } else {
                                         if(isOnline(this)){
                                             searchCertificateReference(data);
@@ -227,7 +227,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     /* Error dialog to show when scan certificate failed */
-    private void showErrorDialog() {
+    private void showErrorDialog(String sms) {
         checkedOutDialog = new Dialog(this);
         checkedOutDialog.setCanceledOnTouchOutside(false);
         checkedOutDialog.setContentView(R.layout.error_dialog);
@@ -239,7 +239,7 @@ public class HomeActivity extends AppCompatActivity {
 
         message.setText("Verification Failed");
         applicant_name.setText("Error");
-        description.setText("Applicant already checked in today");
+        description.setText(sms);
 
         String scannedDate = dateFormatter.format(date);
         String scannedTime = timeFormatter.format(date);
@@ -293,14 +293,14 @@ public class HomeActivity extends AppCompatActivity {
         StringRequest request = new StringRequest(Request.Method.POST, Config.GET_APPLICANT,
                 response -> {
                     searchDialog.dismiss();
-                    Log.e(Config.LOG_TAG, String.valueOf(response));
+//                    Log.e(Config.LOG_TAG, String.valueOf(response));
+                    System.out.println("ZIC scan Response: " + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONObject applicantResponse = jsonObject.getJSONObject("response");
                         JSONObject applicantData = jsonObject.getJSONObject("data");
                         String code = applicantResponse.getString("code");
                         String message = applicantResponse.getString("message");
-                        System.out.println("Response Data " + applicantData);
 
                         if(code.equals("200")) {
                             Log.e(Config.LOG_TAG, String.valueOf(applicantData));
@@ -310,21 +310,27 @@ public class HomeActivity extends AppCompatActivity {
                             nationality = applicantData.getString("nationality");
                             arrivalDate = applicantData.getString("arrival_date");
                             passportNumber = applicantData.getString("passport_number");
-                            applicationStatus  = applicantData.getString("application_status");
+                            applicationStatus  = applicantData.getString("insurance_status");
+                            System.out.println("Applicant  status " + applicationStatus);
 
-                            Bundle bundle = new Bundle();
-                            bundle.putString(Config.INCOMING_TAG, tag);
-                            bundle.putString("applicant_name", applicantName);
-                            bundle.putString("reference_number", referenceNumber);
-                            bundle.putString("nationality", nationality);
-                            bundle.putString("arrival_date", arrivalDate);
-                            bundle.putString("passport_number", passportNumber);
-                            bundle.putString("application_status", applicationStatus);
+                            if(Objects.equals(applicationStatus, "Expired")){
+                                showErrorDialog("Insurance certificate expired");
+                            }else {
+                                Bundle bundle = new Bundle();
+                                bundle.putString(Config.INCOMING_TAG, tag);
+                                bundle.putString("applicant_name", applicantName);
+                                bundle.putString("reference_number", referenceNumber);
+                                bundle.putString("nationality", nationality);
+                                bundle.putString("arrival_date", arrivalDate);
+                                bundle.putString("passport_number", passportNumber);
+                                bundle.putString("application_status", applicationStatus);
 
-                            Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
-                            intent.putExtras(bundle);
-                            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+                                Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
+                                intent.putExtras(bundle);
+                                intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                            }
+
                         } else {
                             showSnackBar("Failed to get Applicant: " + message);
                         }
@@ -370,22 +376,25 @@ public class HomeActivity extends AppCompatActivity {
             String arrival_date = applicationData.getString("arrival_date");
             String passport_number = applicationData.getString("passport_number");
             String application_status = applicationData.getString("application_status");
+            System.out.println("Insurance " + application_status);
 
-            Bundle bundle = new Bundle();
-            bundle.putString(Config.INCOMING_TAG, tag);
-            bundle.putString("name", name);
-            bundle.putString("reference_number", reference_number);
-            bundle.putString("nationality", nationality);
-            bundle.putString("arrival_date",arrival_date);
-            bundle.putString("passport_number", passport_number);
-            bundle.putString("application_status", application_status);
+            if(application_status.equals("Expired")){
+                showErrorDialog("Insurance certificate expired");
+            }else{
+                Bundle bundle = new Bundle();
+                bundle.putString(Config.INCOMING_TAG, tag);
+                bundle.putString("name", name);
+                bundle.putString("reference_number", reference_number);
+                bundle.putString("nationality", nationality);
+                bundle.putString("arrival_date",arrival_date);
+                bundle.putString("passport_number", passport_number);
+                bundle.putString("application_status", application_status);
 
                 Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
                 intent.putExtras(bundle);
                 intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-
-
+            }
 
         } catch (JSONException exception) {
             Log.e("Error", exception.getMessage());

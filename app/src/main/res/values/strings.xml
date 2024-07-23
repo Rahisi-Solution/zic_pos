@@ -29,7 +29,7 @@
     <string name="last_certificate">Last Certificate</string>
     <string name="nationality">Nationality</string>
     <string name="arrival_date">Insurance Start Date</string>
-    <string name="reference_number">Reference Number</string>
+    <string name="reference_number">Insurance Number</string>
     <string name="passport_number">Passport Number</string>
     <string name="applicant_travel_details">Applicant Travel Details</string>
     <string name="mark_verified">Mark Verified</string>

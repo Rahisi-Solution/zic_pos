@@ -66,7 +66,6 @@ public class ResultActivity extends AppCompatActivity {
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     Date date = new Date();
-
     private RequestDAO requestDAO;
 
     @Override
