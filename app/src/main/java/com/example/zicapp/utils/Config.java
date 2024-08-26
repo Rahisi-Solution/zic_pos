@@ -5,7 +5,7 @@ public class Config {
     public static final String LOG_TAG = "ZIC_APP";
 
     // Local endPoint
-//     public static final String ENDPOINT = "http://172.16.10.184:6000/pos/";
+    //public static final String ENDPOINT = "http://172.16.10.165:7500/pos/";
 
     // Online endPoint
     public static final String ENDPOINT = "https://earrival.rahisi.co.tz/api/pos/";

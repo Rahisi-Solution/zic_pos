@@ -32,6 +32,7 @@
     <string name="applicant_travel_details">Maelezo ya Safari ya Mwombaji</string>
     <string name="mark_verified">Thibitisha Bima</string>
     <string name="reference_number">Nambari ya Bima</string>
+    <string name="birth_date">Tarehe ya Kuzaliwa</string>
     <string name="passport_number">Nambari ya Pasipoti</string>
     <string name="change_password">Badili Nenosiri</string>
     <string name="reset_password">Tengua Nenosiri</string>

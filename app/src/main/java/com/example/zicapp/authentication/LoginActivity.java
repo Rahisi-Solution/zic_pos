@@ -228,6 +228,7 @@ public class LoginActivity extends AppCompatActivity {
                     String nationality = applicationObject.getString("nationality");
                     String arrivalDate = applicationObject.getString("arrival_date");
                     String passportNumber = applicationObject.getString("passport_number");
+                    String birthDate = applicationObject.getString("birth_date");
                     String applicationStatus = applicationObject.getString("insuarance_status");
 //                    String insuranceStatus = applicationObject.getString("application_status");
 
@@ -236,6 +237,7 @@ public class LoginActivity extends AppCompatActivity {
                     _applicationObject.put("reference_number", referenceNumber);
                     _applicationObject.put("nationality", nationality);
                     _applicationObject.put("arrival_date",  arrivalDate);
+                    _applicationObject.put("birth_date",  birthDate);
                     _applicationObject.put("passport_number", passportNumber);
                     _applicationObject.put("application_status", applicationStatus);
 

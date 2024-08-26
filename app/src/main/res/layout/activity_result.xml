@@ -116,7 +116,7 @@
         app:layout_constraintVertical_bias="0.02"
         android:padding="5dp"
         android:rowCount="2"
-        android:columnCount="1"
+        android:columnCount="2"
         >
 
         <TextView
@@ -127,6 +127,13 @@
             android:layout_gravity="start"
             />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/birth_date"
+            android:fontFamily="@font/rubik_regular"
+            android:layout_gravity="end"
+            />
 
         <TextView
             android:id="@+id/reference_number"
@@ -137,6 +144,17 @@
             android:textAllCaps="true"
             android:fontFamily="@font/rubik_medium"
             android:layout_gravity="start"
+            />
+
+        <TextView
+            android:id="@+id/birth_date"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/loggedin_date"
+            android:textAllCaps="true"
+            android:fontFamily="@font/rubik_regular"
+            android:textSize="20sp"
+            android:layout_gravity="end"
             />
 
     </GridLayout>

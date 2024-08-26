@@ -72,6 +72,7 @@ public class HomeActivity extends AppCompatActivity {
     String referenceNumber;
     String nationality;
     String arrivalDate;
+    String birthDate;
     String passportNumber;
     String applicationStatus;
     private Dialog checkedOutDialog;
@@ -138,7 +139,6 @@ public class HomeActivity extends AppCompatActivity {
     // Check Device internet connectivity
     public static boolean isOnline(Context context){
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
-
         if(connectivityManager != null) {
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             return activeNetwork != null && activeNetwork.isConnected();
@@ -309,6 +309,7 @@ public class HomeActivity extends AppCompatActivity {
                             referenceNumber = applicantData.getString("reference_number");
                             nationality = applicantData.getString("nationality");
                             arrivalDate = applicantData.getString("arrival_date");
+                            birthDate = applicantData.getString("birth_date");
                             passportNumber = applicantData.getString("passport_number");
                             applicationStatus  = applicantData.getString("insurance_status");
                             System.out.println("Applicant  status " + applicationStatus);
@@ -322,6 +323,7 @@ public class HomeActivity extends AppCompatActivity {
                                 bundle.putString("reference_number", referenceNumber);
                                 bundle.putString("nationality", nationality);
                                 bundle.putString("arrival_date", arrivalDate);
+                                bundle.putString("birth_date", birthDate);
                                 bundle.putString("passport_number", passportNumber);
                                 bundle.putString("application_status", applicationStatus);
 
@@ -375,6 +377,7 @@ public class HomeActivity extends AppCompatActivity {
             String nationality = applicationData.getString("nationality");
             String arrival_date = applicationData.getString("arrival_date");
             String passport_number = applicationData.getString("passport_number");
+            String birth_date = applicationData.getString("birth_date");
             String application_status = applicationData.getString("application_status");
             System.out.println("Insurance " + application_status);
 
@@ -387,6 +390,7 @@ public class HomeActivity extends AppCompatActivity {
                 bundle.putString("reference_number", reference_number);
                 bundle.putString("nationality", nationality);
                 bundle.putString("arrival_date",arrival_date);
+                bundle.putString("birth_date",birth_date);
                 bundle.putString("passport_number", passport_number);
                 bundle.putString("application_status", application_status);
 

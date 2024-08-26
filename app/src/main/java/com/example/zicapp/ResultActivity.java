@@ -50,6 +50,7 @@ public class ResultActivity extends AppCompatActivity {
     TextView applicant_name;
     TextView nationality;
     TextView arrival_date;
+    TextView birth_date;
 
     private String userName;
     private String authToken;
@@ -58,6 +59,7 @@ public class ResultActivity extends AppCompatActivity {
     private String applicantName;
     private String nationalities;
     private String arrivalDate;
+    private String birthDate;
 
     private ProgressDialog searchDialog;
     View parentLayout;
@@ -79,6 +81,7 @@ public class ResultActivity extends AppCompatActivity {
         applicant_name = findViewById(R.id.applicant_name);
         nationality = findViewById(R.id.nationality);
         arrival_date = findViewById(R.id.arrival_date);
+        birth_date = findViewById(R.id.birth_date);
         parentLayout = findViewById(android.R.id.content);
 
         prepareData();
@@ -107,11 +110,13 @@ public class ResultActivity extends AppCompatActivity {
         applicantName = bundle.getString("applicant_name");
         nationalities = bundle.getString("nationality");
         arrivalDate = bundle.getString("arrival_date");
+        birthDate = bundle.getString("birth_date");
         reference_number.setText(referenceNumber);
         passport_number.setText(passportNumber);
         applicant_name.setText(applicantName);
         nationality.setText(nationalities);
         arrival_date.setText(arrivalDate);
+        birth_date.setText(birthDate);
     }
 
     private void markVerified(){

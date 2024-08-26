@@ -35,7 +35,7 @@ public class OfflineDB extends SQLiteOpenHelper {
     scanned_certificate =  "CREATE TABLE scanned_certificate (reference_number TEXT, date TEXT, time TEXT)";
     failed_certificate =  "CREATE TABLE failed_certificate (reference_number TEXT, date TEXT, time TEXT)";
     checked_in = "CREATE TABLE checked_in (reference_number TEXT, name TEXT, checkins TEXT, date TEXT)";
-    applications = "CREATE TABLE applications (reference_number TEXT, name TEXT, nationality TEXT, arrival_date TEXT, passport_number TEXT, application_status TEXT)";
+    applications = "CREATE TABLE applications (reference_number TEXT, name TEXT, nationality TEXT, arrival_date TEXT,birth_date TEXT, passport_number TEXT, application_status TEXT)";
 
     // Executing query to Create Table in offline database (SQLite)
     sqLiteDatabase.execSQL(scanned_certificate);
@@ -70,6 +70,7 @@ public class OfflineDB extends SQLiteOpenHelper {
             values.put("name", jsonObject.getString("name"));
             values.put("nationality", jsonObject.getString("nationality"));
             values.put("arrival_date", jsonObject.getString("arrival_date"));
+            values.put("birth_date", jsonObject.getString("birth_date"));
             values.put("passport_number", jsonObject.getString("passport_number"));
             values.put("application_status", jsonObject.getString("application_status"));
         } catch (JSONException exception) {
