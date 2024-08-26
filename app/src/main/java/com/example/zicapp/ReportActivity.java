@@ -55,7 +55,6 @@ public class ReportActivity extends AppCompatActivity {
     // Get first Certificate Reference Number
     public void getFirstCertificate() {
         JSONArray firstCheckin = offlineDB.getFirstCertificate();
-
         for (int i = 0; i < firstCheckin.length(); i++) {
             try {
                 JSONObject _firstCheckin = firstCheckin.getJSONObject(i);

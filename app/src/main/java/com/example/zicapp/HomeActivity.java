@@ -46,6 +46,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -237,9 +239,9 @@ public class HomeActivity extends AppCompatActivity {
         TextView description = checkedOutDialog.findViewById(R.id.desc_text);
         MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
 
-        message.setText("Verification Failed");
+        message.setText(sms);
         applicant_name.setText("Error");
-        description.setText(sms);
+        description.setText("Verification Failed");
 
         String scannedDate = dateFormatter.format(date);
         String scannedTime = timeFormatter.format(date);
@@ -304,7 +306,6 @@ public class HomeActivity extends AppCompatActivity {
 
                         if(code.equals("200")) {
                             Log.e(Config.LOG_TAG, String.valueOf(applicantData));
-
                             applicantName = applicantData.getString("name");
                             referenceNumber = applicantData.getString("reference_number");
                             nationality = applicantData.getString("nationality");
@@ -312,11 +313,16 @@ public class HomeActivity extends AppCompatActivity {
                             birthDate = applicantData.getString("birth_date");
                             passportNumber = applicantData.getString("passport_number");
                             applicationStatus  = applicantData.getString("insurance_status");
-                            System.out.println("Applicant  status " + applicationStatus);
+
+                            LocalDate todayDate = LocalDate.now();
+                            LocalDate insuranceStartDate = LocalDate.parse(arrivalDate);
+                            System.out.println("Comparison date: " + todayDate);
 
                             if(Objects.equals(applicationStatus, "Expired")){
                                 showErrorDialog("Insurance certificate expired");
-                            }else {
+                            }else if(todayDate.isBefore(insuranceStartDate)){
+                                showErrorDialog("Insurance is not Active");
+                            } else {
                                 Bundle bundle = new Bundle();
                                 bundle.putString(Config.INCOMING_TAG, tag);
                                 bundle.putString("applicant_name", applicantName);
@@ -380,9 +386,13 @@ public class HomeActivity extends AppCompatActivity {
             String birth_date = applicationData.getString("birth_date");
             String application_status = applicationData.getString("application_status");
             System.out.println("Insurance " + application_status);
+            LocalDate todayDate = LocalDate.now();
+            LocalDate insuranceStartDate = LocalDate.parse(arrival_date);
 
             if(application_status.equals("Expired")){
                 showErrorDialog("Insurance certificate expired");
+            }else if(todayDate.isBefore(insuranceStartDate)){
+                showErrorDialog("Insurance is not Active");
             }else{
                 Bundle bundle = new Bundle();
                 bundle.putString(Config.INCOMING_TAG, tag);
