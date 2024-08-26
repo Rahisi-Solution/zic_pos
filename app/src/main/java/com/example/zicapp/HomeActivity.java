@@ -19,6 +19,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -258,6 +259,36 @@ public class HomeActivity extends AppCompatActivity {
         checkedOutDialog.show();
     }
 
+    /* Error dialog to show when scan certificate failed */
+    private void showAttentionDialog(String sms) {
+        checkedOutDialog = new Dialog(this);
+        checkedOutDialog.setCanceledOnTouchOutside(false);
+        checkedOutDialog.setContentView(R.layout.error_dialog);
+
+        TextView message = checkedOutDialog.findViewById(R.id.message_title);
+        TextView applicant_name = checkedOutDialog.findViewById(R.id.name_title);
+        TextView description = checkedOutDialog.findViewById(R.id.desc_text);
+        MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
+
+        message.setText(sms);
+        applicant_name.setText("Attention");
+        description.setText("Verification Failed");
+
+        String scannedDate = dateFormatter.format(date);
+        String scannedTime = timeFormatter.format(date);
+        String referenceNumber = "CT-1300" + scannedTime;
+        offlineDB.insertInvalidCertificate(referenceNumber, scannedDate, scannedTime);
+        dismissButton.setOnClickListener(view -> {
+            checkedOutDialog.dismiss();
+            showSnackBar("Invalid Certificate");
+            Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
+            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        checkedOutDialog.setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK);
+        checkedOutDialog.show();
+    }
+
     // Error dialog to show when scan arrival or departure failed //
     private void showCheckedDialog(String applicantName, String referenceNumber, String status, int flag) {
         checkedOutDialog = new Dialog(this);
@@ -314,29 +345,37 @@ public class HomeActivity extends AppCompatActivity {
                             passportNumber = applicantData.getString("passport_number");
                             applicationStatus  = applicantData.getString("insurance_status");
 
-                            LocalDate todayDate = LocalDate.now();
-                            LocalDate insuranceStartDate = LocalDate.parse(arrivalDate);
+                            LocalDate todayDate = null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                todayDate = LocalDate.now();
+                            }
+                            LocalDate insuranceStartDate = null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                insuranceStartDate = LocalDate.parse(arrivalDate);
+                            }
                             System.out.println("Comparison date: " + todayDate);
 
                             if(Objects.equals(applicationStatus, "Expired")){
                                 showErrorDialog("Insurance certificate expired");
-                            }else if(todayDate.isBefore(insuranceStartDate)){
-                                showErrorDialog("Insurance is not Active");
-                            } else {
-                                Bundle bundle = new Bundle();
-                                bundle.putString(Config.INCOMING_TAG, tag);
-                                bundle.putString("applicant_name", applicantName);
-                                bundle.putString("reference_number", referenceNumber);
-                                bundle.putString("nationality", nationality);
-                                bundle.putString("arrival_date", arrivalDate);
-                                bundle.putString("birth_date", birthDate);
-                                bundle.putString("passport_number", passportNumber);
-                                bundle.putString("application_status", applicationStatus);
+                            }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                if(todayDate.isBefore(insuranceStartDate)){
+                                    showAttentionDialog("Your insurance will be active on " + arrivalDate);
+                                } else {
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString(Config.INCOMING_TAG, tag);
+                                    bundle.putString("applicant_name", applicantName);
+                                    bundle.putString("reference_number", referenceNumber);
+                                    bundle.putString("nationality", nationality);
+                                    bundle.putString("arrival_date", arrivalDate);
+                                    bundle.putString("birth_date", birthDate);
+                                    bundle.putString("passport_number", passportNumber);
+                                    bundle.putString("application_status", applicationStatus);
 
-                                Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
-                                intent.putExtras(bundle);
-                                intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
+                                    Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
+                                    intent.putExtras(bundle);
+                                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                }
                             }
 
                         } else {
@@ -386,28 +425,36 @@ public class HomeActivity extends AppCompatActivity {
             String birth_date = applicationData.getString("birth_date");
             String application_status = applicationData.getString("application_status");
             System.out.println("Insurance " + application_status);
-            LocalDate todayDate = LocalDate.now();
-            LocalDate insuranceStartDate = LocalDate.parse(arrival_date);
+            LocalDate todayDate = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                todayDate = LocalDate.now();
+            }
+            LocalDate insuranceStartDate = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                insuranceStartDate = LocalDate.parse(arrival_date);
+            }
 
             if(application_status.equals("Expired")){
                 showErrorDialog("Insurance certificate expired");
-            }else if(todayDate.isBefore(insuranceStartDate)){
-                showErrorDialog("Insurance is not Active");
-            }else{
-                Bundle bundle = new Bundle();
-                bundle.putString(Config.INCOMING_TAG, tag);
-                bundle.putString("name", name);
-                bundle.putString("reference_number", reference_number);
-                bundle.putString("nationality", nationality);
-                bundle.putString("arrival_date",arrival_date);
-                bundle.putString("birth_date",birth_date);
-                bundle.putString("passport_number", passport_number);
-                bundle.putString("application_status", application_status);
+            }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if(todayDate.isBefore(insuranceStartDate)){
+                    showErrorDialog("Insurance is not Active");
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putString(Config.INCOMING_TAG, tag);
+                    bundle.putString("name", name);
+                    bundle.putString("reference_number", reference_number);
+                    bundle.putString("nationality", nationality);
+                    bundle.putString("arrival_date",arrival_date);
+                    bundle.putString("birth_date",birth_date);
+                    bundle.putString("passport_number", passport_number);
+                    bundle.putString("application_status", application_status);
 
-                Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
-                intent.putExtras(bundle);
-                intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                    Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
+                    intent.putExtras(bundle);
+                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
             }
 
         } catch (JSONException exception) {

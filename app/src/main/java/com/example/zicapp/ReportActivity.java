@@ -14,6 +14,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class ReportActivity extends AppCompatActivity {
     OfflineDB offlineDB = new OfflineDB(ReportActivity.this);
 
@@ -22,6 +27,7 @@ public class ReportActivity extends AppCompatActivity {
     TextView totalCertificates;
     TextView firstCertificate;
     TextView lastCertificate;
+    String today_date_report;
 
     int valid_certificate;
     int invalid_certificate;
@@ -49,7 +55,8 @@ public class ReportActivity extends AppCompatActivity {
         getFirstCertificate();
         getLastCertificate();
 
-
+        showTodayDate();
+        today_date_report = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
     }
 
     // Get first Certificate Reference Number
@@ -79,6 +86,13 @@ public class ReportActivity extends AppCompatActivity {
                 exception.printStackTrace();
             }
         }
+    }
+
+    // Call the method to show today's date
+    public void showTodayDate() {
+        String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        TextView dateReport = findViewById(R.id.today_date_report);
+        dateReport.setText(todayDate);
     }
 
     // When back button key is presses return to Home Screen
