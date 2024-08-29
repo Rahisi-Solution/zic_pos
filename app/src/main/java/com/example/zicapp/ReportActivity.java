@@ -31,6 +31,8 @@ public class ReportActivity extends AppCompatActivity {
 
     int valid_certificate;
     int invalid_certificate;
+    int first_certificate;
+    int last_certificate;
     int total_certificates;
 
     @Override
@@ -46,10 +48,14 @@ public class ReportActivity extends AppCompatActivity {
 
         valid_certificate = offlineDB.totalCertificates();
         invalid_certificate = offlineDB.totalInvalidCertificates();
+             first_certificate = offlineDB.getFirstCertificate().length();
+        last_certificate = offlineDB.getLastCertificate().length();
         total_certificates = valid_certificate + invalid_certificate;
 
         validCertificate.setText(String.valueOf(valid_certificate));
         inValidCertificate.setText(String.valueOf(invalid_certificate));
+        firstCertificate.setText(String.valueOf(first_certificate));
+        lastCertificate.setText(String.valueOf(last_certificate));
         totalCertificates.setText(String.valueOf(total_certificates));
 
         getFirstCertificate();

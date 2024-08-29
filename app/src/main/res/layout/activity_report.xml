@@ -135,7 +135,7 @@
             android:layout_gravity="end"
             android:fontFamily="@font/rubik_regular"
             android:paddingVertical="4dp"
-            android:text="1"
+            android:text="-"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
@@ -155,7 +155,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:fontFamily="@font/rubik_regular"
-            android:text="0"
+            android:text="-"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
@@ -175,7 +175,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:fontFamily="@font/rubik_medium"
-            android:text="12"
+            android:text="-"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
@@ -195,7 +195,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:fontFamily="@font/rubik_regular"
-            android:text="CT-A-97867786"
+            android:text="-"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
@@ -215,7 +215,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:fontFamily="@font/rubik_regular"
-            android:text="CT-A-97867786"
+            android:text="-"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
