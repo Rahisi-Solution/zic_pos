@@ -6,6 +6,7 @@ public class Config {
 
     // Local endPoint
     //public static final String ENDPOINT = "http://172.16.10.165:7500/pos/";
+    //public static final String ENDPOINT = "http://172.16.10.161:2002/pos/";
 
     // Online endPoint
     public static final String ENDPOINT = "https://earrival.rahisi.co.tz/api/pos/";

@@ -13,7 +13,8 @@
     <string name="loggedin_date">May 20, 2024</string>
     <string name="checked_in">" "</string>
     <string name="checked_out">Total Visitors</string>
-    <string name="scan_zic_certificate">Scan Certificate</string>
+    <string name="arrival_zic_certificate">Arrival Scan Certificate</string>
+    <string name="departure_zic_certificate">Departure Scan Certificate</string>
     <string name="daily_report">Daily Report</string>
     <string name="settings_card">Settings</string>
     <string name="settings2">Settings</string>
@@ -22,11 +23,19 @@
     <string name="report">Report</string>
     <string name="end_of_day_report">End Of Day Report</string>
     <string name="officer_name2" />
-    <string name="valid_certificates">Valid Certificates</string>
-    <string name="total_certificates">Total Certificates</string>
+    <string name="arrival_heading_certificates">Scanned Arrival</string>
+    <string name="valid_arrival_certificates">Valid Scanned Arrival</string>
+    <string name="invalid_arrival_certificates">Invalid Scanned Departure</string>
+    <string name="total_arrival_certificates">Total Scanned Arrival</string>
+    <string name="departure_heading_certificates">Scanned Departure</string>
+    <string name="valid_departure_certificates">Valid Scanned Departure</string>
+    <string name="invalid_departure_certificates">Invalid Scanned Departure</string>
+    <string name="total_departure_certificates">Total Scanned Departure</string>
     <string name="first_certificate">First Certificate</string>
-    <string name="invalid_certificates">Invalid Certificates</string>
     <string name="last_certificate">Last Certificate</string>
+    <string name="arrived_certificate">Scanned Arrival</string>
+
+    <string name="departure_certificate">Scanned Departure</string>
     <string name="nationality">Nationality</string>
     <string name="arrival_date">Insurance Start Date</string>
     <string name="reference_number">Insurance Number</string>

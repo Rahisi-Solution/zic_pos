@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -124,12 +125,33 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:fontFamily="@font/rubik_regular"
-            android:text="@string/valid_certificates"
+            android:text="@string/arrival_heading_certificates"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/checkin_header_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:fontFamily="@font/rubik_regular"
+            android:paddingVertical="4dp"
+            android:text=" "
             android:textAllCaps="false"
             android:textSize="17sp" />
 
         <TextView
-            android:id="@+id/valid_certificates_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:fontFamily="@font/rubik_regular"
+            android:text="@string/valid_arrival_certificates"
+            android:textAllCaps="false"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/valid_arrival_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -145,12 +167,12 @@
             android:layout_gravity="start"
             android:fontFamily="@font/rubik_regular"
             android:paddingVertical="4dp"
-            android:text="@string/invalid_certificates"
+            android:text="@string/invalid_arrival_certificates"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
         <TextView
-            android:id="@+id/invalid_certificates_value"
+            android:id="@+id/invalid_arrival_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -165,12 +187,12 @@
             android:layout_gravity="start"
             android:fontFamily="@font/rubik_medium"
             android:paddingVertical="4dp"
-            android:text="@string/total_certificates"
+            android:text="@string/total_arrival_certificates"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
         <TextView
-            android:id="@+id/total_certificates_count"
+            android:id="@+id/total_arrival_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -179,18 +201,77 @@
             android:textAllCaps="false"
             android:textSize="17sp" />
 
+    </GridLayout>
+
+    <GridLayout
+        android:id="@+id/checkout_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:columnCount="2"
+        android:rowCount="5"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkin_layout"
+        app:layout_constraintVertical_bias="0.14">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:fontFamily="@font/rubik_regular"
+            android:text="@string/departure_heading_certificates"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/checkout_header_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:fontFamily="@font/rubik_regular"
+            android:paddingVertical="4dp"
+            android:text=" "
+            android:textAllCaps="false"
+            android:textSize="17sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:fontFamily="@font/rubik_regular"
+            android:text="@string/valid_departure_certificates"
+            android:textAllCaps="false"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/valid_departure_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:fontFamily="@font/rubik_regular"
+            android:paddingVertical="4dp"
+            android:text="-"
+            android:textAllCaps="false"
+            android:textSize="17sp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:fontFamily="@font/rubik_regular"
             android:paddingVertical="4dp"
-            android:text="@string/first_certificate"
+            android:text="@string/invalid_departure_certificates"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
         <TextView
-            android:id="@+id/first_certificate_value"
+            android:id="@+id/invalid_departure_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -203,18 +284,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:fontFamily="@font/rubik_regular"
+            android:fontFamily="@font/rubik_medium"
             android:paddingVertical="4dp"
-            android:text="@string/last_certificate"
+            android:text="@string/total_departure_certificates"
             android:textAllCaps="false"
             android:textSize="17sp" />
 
         <TextView
-            android:id="@+id/last_certificate_value"
+            android:id="@+id/total_departure_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:fontFamily="@font/rubik_regular"
+            android:fontFamily="@font/rubik_medium"
             android:text="-"
             android:textAllCaps="false"
             android:textSize="17sp" />
