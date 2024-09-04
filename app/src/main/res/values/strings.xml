@@ -11,8 +11,8 @@
     <string name="officer_name">Simoni Uhuru Mshiu</string>
     <string name="officer_type">Airport Officer</string>
     <string name="loggedin_date">May 20, 2024</string>
-    <string name="checked_in">" "</string>
-    <string name="checked_out">Total Visitors</string>
+    <string name="checked_in">"Total Arrival"</string>
+    <string name="checked_out">Total Departure</string>
     <string name="arrival_zic_certificate">Arrival Scan Certificate</string>
     <string name="departure_zic_certificate">Departure Scan Certificate</string>
     <string name="daily_report">Daily Report</string>

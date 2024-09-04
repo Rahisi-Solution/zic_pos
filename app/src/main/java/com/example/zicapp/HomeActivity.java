@@ -62,14 +62,15 @@ public class HomeActivity extends AppCompatActivity {
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     Date date = new Date();
-    private String username;
+    public String username;
     private String entrypoint;
     int total_certificates;
     View parentLayout;
     TextView user_name;
     TextView entry_point;
     TextView today_date;
-    TextView total_visitors;
+    TextView total_checkedin;
+    TextView total_checkedout;
     private String authToken;
     String applicantName;
     String referenceNumber;
@@ -99,20 +100,24 @@ public class HomeActivity extends AppCompatActivity {
         prepareData();
         parentLayout = findViewById(android.R.id.content);
         total_certificates = offlineDB.totalCertificates();
+        total_certificates = offlineDB.totalCertificates();
 
         user_name = findViewById(R.id.officer_name);
         entry_point = findViewById(R.id.entry_point);
         today_date = findViewById(R.id.today_date);
-        total_visitors = findViewById(R.id.total_checkin_count);
+        total_checkedin = findViewById(R.id.total_checkedin_count);
+        total_checkedout = findViewById(R.id.total_checkedout_count);
 
         MaterialCardView certificate = findViewById(R.id.certificate_card);
         MaterialCardView reports = findViewById(R.id.report_card);
         MaterialCardView settings = findViewById(R.id.settings_card);
 
         user_name.setText(username);
+        System.out.println(username);
         entry_point.setText(entrypoint);
         today_date.setText(dateFormatter2.format(date));
-        total_visitors.setText(String.valueOf(total_certificates));
+        total_checkedin.setText(String.valueOf(total_certificates));
+        total_checkedout.setText(String.valueOf(total_certificates));
 
         settings.setOnClickListener(view -> {
             Intent intent = new Intent(HomeActivity.this, SettingsActivity.class);

@@ -102,13 +102,22 @@
             android:columnCount="2">
 
             <TextView
-                android:id="@+id/total_checkin_count"
+                android:id="@+id/total_checkedin_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="50"
                 android:fontFamily="@font/rubik_regular"
                 android:textSize="35sp"
                 android:layout_gravity="start" />
+
+            <TextView
+                android:id="@+id/total_checkedout_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50"
+                android:fontFamily="@font/rubik_regular"
+                android:textSize="35sp"
+                android:layout_gravity="end" />
 
             <TextView
                 android:layout_width="wrap_content"

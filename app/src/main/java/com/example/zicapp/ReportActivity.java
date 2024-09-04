@@ -28,9 +28,9 @@ public class ReportActivity extends AppCompatActivity {
     TextView validCertificate;
     TextView inValidCertificate;
     TextView totalCertificates;
-    TextView officerName;
+    TextView user_name;
     String today_date_report;
-    String username;
+    public String username;
     int valid_certificate;
     int invalid_certificate;
     int total_certificates;
@@ -40,7 +40,7 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
 
-        officerName = findViewById(R.id.officer_name_report);
+        user_name = findViewById(R.id.officer_name);
         validCertificate = findViewById(R.id.valid_arrival_value);
         inValidCertificate = findViewById(R.id.invalid_arrival_value);
         totalCertificates = findViewById(R.id.total_arrival_count);
@@ -56,9 +56,9 @@ public class ReportActivity extends AppCompatActivity {
         showTodayDate();
         today_date_report = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
 
-        officerName.setText(username);
+        user_name.setText(username);
         System.out.println(username);
-        officerName.setTextColor(getResources().getColor(R.color.black));
+        user_name.setTextColor(getResources().getColor(R.color.black));
         SharedPreferences preferences = ReportActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         username = preferences.getString(Config.USER_NAME, "n.a");
     }

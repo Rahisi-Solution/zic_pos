@@ -11,8 +11,8 @@
     <string name="officer_name">Simoni Uhuru Mshiu</string>
     <string name="officer_type">Afisa Uwanja wa Ndege</string>
     <string name="loggedin_date">May 20, 2024</string>
-    <string name="checked_in">" "</string>
-    <string name="checked_out">Jumla ya Wageni</string>
+    <string name="checked_in">"Waliongia"</string>
+    <string name="checked_out">Waliotoka</string>
     <string name="arrival_zic_certificate">Hakiki Kuwasili</string>
     <string name="departure_zic_certificate">Hakiki Kuondoka</string>
     <string name="daily_report">Ripoti ya Siku</string>

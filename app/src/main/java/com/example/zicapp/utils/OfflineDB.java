@@ -29,9 +29,9 @@ public class OfflineDB extends SQLiteOpenHelper {
     String scanned_certificate;
     String failed_certificate;
     String checked_in;
-        String applications;
+    String applications;
 
-        // Creating Tables in offline database (SQLite)
+    // Creating Tables in offline database (SQLite)
     scanned_certificate =  "CREATE TABLE scanned_certificate (reference_number TEXT, date TEXT, time TEXT)";
     failed_certificate =  "CREATE TABLE failed_certificate (reference_number TEXT, date TEXT, time TEXT)";
     checked_in = "CREATE TABLE checked_in (reference_number TEXT, name TEXT, checkins TEXT, date TEXT)";
