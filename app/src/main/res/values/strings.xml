@@ -21,11 +21,11 @@
     <string name="officer_language">Language</string>
     <string name="logout2">Logout</string>
     <string name="report">Report</string>
-    <string name="end_of_day_report">End Of Day Report</string>
-    <string name="officer_name2" />
+    <string name="end_of_day_report">End Of The Day Report</string>
+    <string name="officer_name2">Entry Point</string>
     <string name="arrival_heading_certificates">Scanned Arrival</string>
     <string name="valid_arrival_certificates">Valid Scanned Arrival</string>
-    <string name="invalid_arrival_certificates">Invalid Scanned Departure</string>
+    <string name="invalid_arrival_certificates">Invalid Scanned Arrival</string>
     <string name="total_arrival_certificates">Total Scanned Arrival</string>
     <string name="departure_heading_certificates">Scanned Departure</string>
     <string name="valid_departure_certificates">Valid Scanned Departure</string>
@@ -48,4 +48,7 @@
     <string name="old_password">Old Password</string>
     <string name="new_password">New Password</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="attention">Attention</string>
+    <string name="verification_failed">Verification Failed</string>
+    <string name="error">Error</string>
 </resources>

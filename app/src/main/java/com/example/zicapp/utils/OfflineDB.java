@@ -3,6 +3,7 @@ package com.example.zicapp.utils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -27,19 +28,25 @@ public class OfflineDB extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
     String scanned_certificate;
+    String departure_certificate;
     String failed_certificate;
+    String failed_departure;
     String checked_in;
     String applications;
 
     // Creating Tables in offline database (SQLite)
     scanned_certificate =  "CREATE TABLE scanned_certificate (reference_number TEXT, date TEXT, time TEXT)";
+    departure_certificate =  "CREATE TABLE departure_certificate (reference_number TEXT, date TEXT, time TEXT)";
     failed_certificate =  "CREATE TABLE failed_certificate (reference_number TEXT, date TEXT, time TEXT)";
+    failed_departure =  "CREATE TABLE failed_departure (reference_number TEXT, date TEXT, time TEXT)";
     checked_in = "CREATE TABLE checked_in (reference_number TEXT, name TEXT, checkins TEXT, date TEXT)";
     applications = "CREATE TABLE applications (reference_number TEXT, name TEXT, nationality TEXT, arrival_date TEXT,birth_date TEXT, passport_number TEXT, application_status TEXT)";
 
     // Executing query to Create Table in offline database (SQLite)
     sqLiteDatabase.execSQL(scanned_certificate);
+    sqLiteDatabase.execSQL(departure_certificate);
     sqLiteDatabase.execSQL(failed_certificate);
+    sqLiteDatabase.execSQL(failed_departure);
     sqLiteDatabase.execSQL(checked_in);
     sqLiteDatabase.execSQL(applications);
 
@@ -50,13 +57,17 @@ public class OfflineDB extends SQLiteOpenHelper {
 
         // Drop Table on the Database Upgrade
         String scannedCertificates = "DROP TABLE IF EXISTS scanned_certificate";
+        String departureCertificates = "DROP TABLE IF EXISTS departure_certificate";
         String failedCertificate = "DROP TABLE IF EXISTS failed_certificate";
+        String failedDeparture = "DROP TABLE IF EXISTS failed_certificate";
         String checked_in = "DROP TABLE IF EXISTS checked_in";
         String applications = "DROP TABLE IF EXISTS applications";
 
         // Executing Drop Table Queries
         sqLiteDatabase.execSQL(scannedCertificates);
+        sqLiteDatabase.execSQL(departureCertificates);
         sqLiteDatabase.execSQL(failedCertificate);
+        sqLiteDatabase.execSQL(failedDeparture);
         sqLiteDatabase.execSQL(checked_in);
         sqLiteDatabase.execSQL(applications);
     }
@@ -82,9 +93,8 @@ public class OfflineDB extends SQLiteOpenHelper {
 
     }
 
-
-    // Inserting Valid Certificate in scanned_certificate Table
-    public void insertCertificate(String reference_number, String date, String time){
+    // Inserting Arrival Certificate in scanned_certificate Table
+    public void insertArrivalCertificate(String reference_number, String date, String time){
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -98,6 +108,24 @@ public class OfflineDB extends SQLiteOpenHelper {
         }
 
         database.insert("scanned_certificate", null, values);
+        database.close();
+    }
+
+    // Inserting Departure Certificate in scanned_certificate Table
+    public void insertDepartureCertificate(String reference_number, String date, String time){
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        try {
+            values.put("reference_number", reference_number);
+            values.put("date", date);
+            values.put("time", time);
+            System.out.println("Insert departure Certificate " + values);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        database.insert("departure_certificate", null, values);
         database.close();
     }
 
@@ -119,8 +147,26 @@ public class OfflineDB extends SQLiteOpenHelper {
         database.close();
     }
 
+    // Inserting Invalid Certificate in failed_departure Table
+    public void insertInvalidDeparture(String reference_number, String date, String time){
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        try {
+            values.put("reference_number", reference_number);
+            values.put("date", date);
+            values.put("time", time);
+            System.out.println("Insert Failed Departure" + values);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        database.insert("failed_departure", null, values);
+        database.close();
+    }
+
     // Calculating Total Valid Certificates
-    public int totalCertificates() {
+    public int totalArrivalCertificates() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date today = new Date();
         String query = "SELECT * FROM scanned_certificate " + "WHERE TRIM(date)='" + dateFormat.format(today) +"'";
@@ -131,11 +177,35 @@ public class OfflineDB extends SQLiteOpenHelper {
         return count;
     }
 
-    // Calculating Total Invalid Certificates
+    // Calculating Total Valid Certificates
+    public int totalDepartureCertificates() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Date today = new Date();
+        String query = "SELECT * FROM departure_certificate " + "WHERE TRIM(date)='" + dateFormat.format(today) +"'";
+        SQLiteDatabase database = this.getWritableDatabase();
+        Cursor cursor = database.rawQuery(query, null);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
+    // Calculating Total Invalid Arrival
     public int totalInvalidCertificates() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date today = new Date();
         String query = "SELECT * FROM failed_certificate " + "WHERE TRIM(date)='" + dateFormat.format(today) +"'";
+        SQLiteDatabase database = this.getWritableDatabase();
+        Cursor cursor = database.rawQuery(query, null);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
+    // Calculating Total Invalid Departure
+    public int totalInvalidDeparture() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Date today = new Date();
+        String query = "SELECT * FROM failed_departure " + "WHERE TRIM(date)='" + dateFormat.format(today) +"'";
         SQLiteDatabase database = this.getWritableDatabase();
         Cursor cursor = database.rawQuery(query, null);
         int count = cursor.getCount();
@@ -297,5 +367,29 @@ public class OfflineDB extends SQLiteOpenHelper {
 
         database.insert("failed_checkins", null, values);
         database.close();
+    }
+
+    public void updateCertificateStatusToInUse(String certificateNumber, String status) {
+        try {
+            String updateQuery = "UPDATE applications SET application_status = '" + status + "' WHERE TRIM(reference_number)='" + certificateNumber +"'";
+            SQLiteDatabase database = this.getWritableDatabase();
+            System.out.println("Update Application status👍: " + updateQuery);
+            Log.e("Update Application status", updateQuery);
+            database.execSQL(updateQuery);
+        } catch (SQLException e) {
+            System.out.println("Update Status Error👎: " + e.getMessage());
+            Log.e("Update Status Error", e.getMessage());
+        }
+    }
+
+    public void updateCertificateStatusToSeized(String certificateNumber, String status) {
+        try {
+            String updateQuery = "UPDATE applications SET application_status = '" + status + "' WHERE TRIM(reference_number)='" + certificateNumber +"'";
+            SQLiteDatabase database = this.getWritableDatabase();
+            Log.i("Update Application status", updateQuery);
+            database.execSQL(updateQuery);
+        } catch (SQLException e) {
+            Log.e("Update Tonnage Error", e.getMessage());
+        }
     }
 }

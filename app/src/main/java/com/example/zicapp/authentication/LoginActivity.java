@@ -37,6 +37,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LoginActivity extends AppCompatActivity {
     OfflineDB offlineDB = new OfflineDB(LoginActivity.this);
@@ -154,7 +156,8 @@ public class LoginActivity extends AppCompatActivity {
 
                                 Log.e("APPLICATIONS", String.valueOf(applications));
 
-                                saveApplications(applications);
+//                                 saveApplications(applications);
+                                saveApplicationsAsync(applications);
 
                                 SharedPreferences preferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = preferences.edit();
@@ -189,7 +192,7 @@ public class LoginActivity extends AppCompatActivity {
                     try {
                         if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
                             System.out.println("The error HERE = " + error);
-                            showSnackBar("Network Error please check your Internet Bandwith");
+                            showSnackBar("Network Error please check your Internet Bundle");
                         } else {
                             showSnackBar(String.valueOf(error));
                         }
@@ -216,6 +219,11 @@ public class LoginActivity extends AppCompatActivity {
         request.setRetryPolicy(new DefaultRetryPolicy(4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
 
+    }
+
+    private void saveApplicationsAsync(JSONArray applications) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> saveApplications(applications));
     }
 
     private void saveApplications(JSONArray applications) {

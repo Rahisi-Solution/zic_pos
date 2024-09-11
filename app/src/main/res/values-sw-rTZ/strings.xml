@@ -22,15 +22,15 @@
     <string name="logout2">Ondoka</string>
     <string name="report">Ripoti</string>
     <string name="end_of_day_report">Ripoti ya Siku</string>
-    <string name="officer_name2" />
-    <string name="arrival_heading_certificates">Valid Certificates</string>
-    <string name="valid_arrival_certificates">Valid Scanned Arrival</string>
-    <string name="invalid_arrival_certificates">Invalid Scanned Departure</string>
-    <string name="total_arrival_certificates">Jumla ya Walioingia</string>
-    <string name="departure_heading_certificates">Scanned Departure</string>
-    <string name="valid_departure_certificates">Valid Scanned Departure</string>
-    <string name="invalid_departure_certificates">Invalid Scanned Departure</string>
-    <string name="total_departure_certificates">Total Scanned Departure</string>
+    <string name="officer_name2">Entry Point</string>
+    <string name="arrival_heading_certificates">Walioingia</string>
+    <string name="valid_arrival_certificates">Vyeti sahihi</string>
+    <string name="invalid_arrival_certificates">Vyeti batili</string>
+    <string name="total_arrival_certificates">Jumla ya Vyeti</string>
+    <string name="departure_heading_certificates">Waliotoka</string>
+    <string name="valid_departure_certificates">Vyeti sahihi</string>
+    <string name="invalid_departure_certificates">Vyeti batili</string>
+    <string name="total_departure_certificates">Jumla ya vyeti</string>
     <string name="first_certificate">Cheti cha Kwanza</string>
     <string name="last_certificate">Cheti cha Mwisho</string>
     <string name="arrived_certificate">Scanned Arrival</string>
@@ -47,4 +47,7 @@
     <string name="old_password">Nenosiri la zamani</string>
     <string name="new_password">Nenosiri Jipya</string>
     <string name="confirm_password">Thibitisha Nenosiri</string>
+    <string name="attention">Attention</string>
+    <string name="verification_failed">Verification Failed</string>
+    <string name="error">Error</string>
 </resources>

@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class ResultActivity extends AppCompatActivity {
     OfflineDB offlineDB = new OfflineDB(ResultActivity.this);
@@ -60,6 +61,7 @@ public class ResultActivity extends AppCompatActivity {
     private String nationalities;
     private String arrivalDate;
     private String birthDate;
+    private String flag;
 
     private ProgressDialog searchDialog;
     View parentLayout;
@@ -83,17 +85,31 @@ public class ResultActivity extends AppCompatActivity {
         arrival_date = findViewById(R.id.arrival_date);
         birth_date = findViewById(R.id.birth_date);
         parentLayout = findViewById(android.R.id.content);
-
         prepareData();
-
         requestDAO = new RequestDAO(this);
         requestDAO.open();
 
+        if(Objects.equals(flag, "Arrival")){
+            verify_button.setText("Mark Arrival");
+        } else{
+            verify_button.setText("Mark Departure");
+        }
+
         verify_button.setOnClickListener(v -> {
             if(isOnline(this)){
-                markVerified();
+               if(Objects.equals(flag, "Arrival")){
+                   markVerified();
+               } else{
+                   markSeized();
+               }
             } else {
-                saveCertificateOfflineRequest(authToken, referenceNumber);
+                if(Objects.equals(flag, "Arrival")){
+                    saveCertificateOfflineRequest(authToken, referenceNumber);
+                    offlineDB.updateCertificateStatusToInUse(referenceNumber, "In Use");
+                } else {
+                    saveDepartureCertificateOfflineRequest(authToken, referenceNumber);
+                    offlineDB.updateCertificateStatusToSeized(referenceNumber, "Seized");
+                }
             }
         });
     }
@@ -111,6 +127,7 @@ public class ResultActivity extends AppCompatActivity {
         nationalities = bundle.getString("nationality");
         arrivalDate = bundle.getString("arrival_date");
         birthDate = bundle.getString("birth_date");
+        flag = bundle.getString("flag");
         reference_number.setText(referenceNumber);
         passport_number.setText(passportNumber);
         applicant_name.setText(applicantName);
@@ -121,7 +138,6 @@ public class ResultActivity extends AppCompatActivity {
 
     private void markVerified(){
         searchDialog = ProgressDialog.show(ResultActivity.this, "Processing", "Please wait...");
-
         StringRequest request = new StringRequest(Request.Method.POST, Config.MARK_IN_USE,
                 response -> {
                     searchDialog.dismiss();
@@ -135,9 +151,64 @@ public class ResultActivity extends AppCompatActivity {
                         String checkinReference = applicantData.getString("checkin_reference");
 
                         if(code.equals("200")) {
-                            showSuccessDialog(checkinReference);
+                            showArrivalDialog(checkinReference);
+                            offlineDB.updateCertificateStatusToInUse(referenceNumber, "In Use");
                         } else {
                             showSnackBar("Failed to checkin: " + message);
+                        }
+
+                    } catch (JSONException exception) {
+                        showSnackBar("Request Error: " + exception);
+                    }
+                },
+                error -> {
+                   searchDialog.dismiss();
+                    if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
+                        System.out.println("The error HERE = " + error);
+                        showSnackBar("Network Error please check your Internet Bundle");
+                    } else {
+                        showSnackBar(String.valueOf(error));
+                    }
+                }) {
+            @NonNull
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("authorization", "Bearer " + authToken);
+                params.put("reference_number", referenceNumber);
+                System.out.println("Parameters on mark in use: " + params);
+                return params;
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded";
+            }
+        };
+        RequestQueue queue = Volley.newRequestQueue(this);
+        request.setRetryPolicy(new DefaultRetryPolicy(4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(request);
+    }
+
+    private void markSeized(){
+        searchDialog = ProgressDialog.show(ResultActivity.this, "Processing", "Please wait...");
+        StringRequest request = new StringRequest(Request.Method.POST, Config.MARK_SEIZED,
+                response -> {
+                    searchDialog.dismiss();
+                    Log.e(Config.LOG_TAG, String.valueOf(response));
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONObject applicantResponse = jsonObject.getJSONObject("response");
+                        JSONObject applicantData = jsonObject.getJSONObject("data");
+                        String code = applicantResponse.getString("code");
+                        String message = applicantResponse.getString("message");
+                        String checkoutReference = applicantData.getString("checkout_reference");
+
+                        if(code.equals("200")) {
+                            showDepartureDialog(checkoutReference);
+                            offlineDB.updateCertificateStatusToSeized(referenceNumber, "Seized");
+                        } else {
+                            showSnackBar("Failed to checkout: " + message);
                         }
 
                     } catch (JSONException exception) {
@@ -173,9 +244,15 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void saveCertificateOfflineRequest(String authToken, String referenceNumber) {
-        showSuccessDialog(referenceNumber);
+        showArrivalDialog(referenceNumber);
         System.out.println("Data going offline: " + referenceNumber + " " + authToken);
         requestDAO.addCertificateRequest(authToken, referenceNumber);
+    }
+
+    private void saveDepartureCertificateOfflineRequest(String authToken, String referenceNumber) {
+        showDepartureDialog(referenceNumber);
+        System.out.println("Data going offline: " + referenceNumber + " " + authToken);
+        requestDAO.addDepartureRequest(authToken, referenceNumber);
     }
 
     // Snack bar for display Error Messages
@@ -189,7 +266,7 @@ public class ResultActivity extends AppCompatActivity {
         snackbar.show();
     }
 
-    private void showSuccessDialog(String checkinReference) {
+    private void showArrivalDialog(String checkinReference) {
         checkedOutDialog = new Dialog(this);
         checkedOutDialog.setCanceledOnTouchOutside(false);
         checkedOutDialog.setContentView(R.layout.success_dialog);
@@ -205,7 +282,34 @@ public class ResultActivity extends AppCompatActivity {
 
         String scannedDate = dateFormatter.format(date);
         String scannedTime = timeFormatter.format(date);
-        offlineDB.insertCertificate(referenceNumber, scannedDate, scannedTime);
+        offlineDB.insertArrivalCertificate(referenceNumber, scannedDate, scannedTime);
+        dismissButton.setOnClickListener(view -> {
+            checkedOutDialog.dismiss();
+            Intent intent = new Intent(ResultActivity.this, HomeActivity.class);
+            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        checkedOutDialog.setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK);
+        checkedOutDialog.show();
+    }
+
+    private void showDepartureDialog(String checkoutReference) {
+        checkedOutDialog = new Dialog(this);
+        checkedOutDialog.setCanceledOnTouchOutside(false);
+        checkedOutDialog.setContentView(R.layout.success_dialog);
+
+        TextView message = checkedOutDialog.findViewById(R.id.message_title);
+        TextView applicant_name = checkedOutDialog.findViewById(R.id.name_title);
+        TextView description = checkedOutDialog.findViewById(R.id.desc_text);
+        MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
+
+        message.setText("Valid Certificate");
+        applicant_name.setText("Checkout Successfully");
+        description.setText("Reference " + checkoutReference);
+
+        String scannedDate = dateFormatter.format(date);
+        String scannedTime = timeFormatter.format(date);
+        offlineDB.insertDepartureCertificate(referenceNumber, scannedDate, scannedTime);
         dismissButton.setOnClickListener(view -> {
             checkedOutDialog.dismiss();
             Intent intent = new Intent(ResultActivity.this, HomeActivity.class);
