@@ -198,9 +198,9 @@ public class HomeActivity extends AppCompatActivity {
                         assert data != null;
                         String passedData = Config.removeDoubleQuotes(data);
                         if(passedData.startsWith("IA") || passedData.startsWith("ZIC")) {
-                            JSONObject applicationData = offlineDB.getCertificate(Config.removeDoubleQuotes(data));
-                            System.out.println("Offline certificate " + applicationData);
-                            if(isOnline(this)){
+                            JSONObject applicationData = offlineDB.getApplication(Config.removeDoubleQuotes(data));
+                            System.out.println("Offline certificate on arrival " + applicationData);
+                            if(applicationData.length() == 0){
                                 onlineArrivalSearchCertificateReference(data);
                             } else {
                                 offlineArrivalSearchCertificateReference(data);
@@ -225,7 +225,9 @@ public class HomeActivity extends AppCompatActivity {
                         assert data != null;
                         String passedData = Config.removeDoubleQuotes(data);
                         if(passedData.startsWith("IA") || passedData.startsWith("ZIC")){
-                            if(isOnline(this)){
+                            JSONObject applicationData = offlineDB.getApplication(Config.removeDoubleQuotes(data));
+                            System.out.println("Offline certificate " + applicationData);
+                            if(applicationData.length() == 0){
                                 System.out.println("Departure Online");
                                 onlineDepartureSearchCertificateReference(data);
                             } else {
@@ -416,6 +418,7 @@ public class HomeActivity extends AppCompatActivity {
                                     bundle.putString("passport_number", passportNumber);
                                     bundle.putString("application_status", applicationStatus);
                                     bundle.putString("flag", "Arrival");
+                                    bundle.putString("connectivity", "offline");
 
                                     Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
                                     intent.putExtras(bundle);
@@ -486,7 +489,7 @@ public class HomeActivity extends AppCompatActivity {
             }else{
                     Bundle bundle = new Bundle();
                     bundle.putString(Config.INCOMING_TAG, tag);
-                    bundle.putString("name", name);
+                    bundle.putString("applicant_name", name);
                     bundle.putString("reference_number", reference_number);
                     bundle.putString("nationality", nationality);
                     bundle.putString("arrival_date",arrival_date);
@@ -494,6 +497,7 @@ public class HomeActivity extends AppCompatActivity {
                     bundle.putString("passport_number", passport_number);
                     bundle.putString("application_status", application_status);
                     bundle.putString("flag", "Arrival");
+                    bundle.putString("connectivity", "offline");
 
                     Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
                     intent.putExtras(bundle);
@@ -675,6 +679,7 @@ public class HomeActivity extends AppCompatActivity {
                                 bundle.putString("passport_number", passportNumber);
                                 bundle.putString("application_status", applicationStatus);
                                 bundle.putString("flag", "Departure");
+                                bundle.putString("connectivity", "online");
 
                                 Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
                                 intent.putExtras(bundle);
@@ -746,7 +751,7 @@ public class HomeActivity extends AppCompatActivity {
             }else if(application_status.equals("In Use")){
                 Bundle bundle = new Bundle();
                 bundle.putString(Config.INCOMING_TAG, tag);
-                bundle.putString("name", name);
+                bundle.putString("applicant_name", name);
                 bundle.putString("reference_number", reference_number);
                 bundle.putString("nationality", nationality);
                 bundle.putString("arrival_date",arrival_date);
@@ -754,6 +759,7 @@ public class HomeActivity extends AppCompatActivity {
                 bundle.putString("passport_number", passport_number);
                 bundle.putString("application_status", application_status);
                 bundle.putString("flag", "Departure");
+                bundle.putString("connectivity", "offline");
 
                 Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
                 intent.putExtras(bundle);

@@ -62,6 +62,7 @@ public class ResultActivity extends AppCompatActivity {
     private String arrivalDate;
     private String birthDate;
     private String flag;
+    private String connectivity;
 
     private ProgressDialog searchDialog;
     View parentLayout;
@@ -96,13 +97,15 @@ public class ResultActivity extends AppCompatActivity {
         }
 
         verify_button.setOnClickListener(v -> {
-            if(isOnline(this)){
+            if(Objects.equals(connectivity, "online")){
+                System.out.println("Verification is done " + connectivity);
                if(Objects.equals(flag, "Arrival")){
                    markVerified();
                } else{
                    markSeized();
                }
             } else {
+                System.out.println("Verification is done " + connectivity);
                 if(Objects.equals(flag, "Arrival")){
                     saveCertificateOfflineRequest(authToken, referenceNumber);
                     offlineDB.updateCertificateStatusToInUse(referenceNumber, "In Use");
@@ -128,6 +131,7 @@ public class ResultActivity extends AppCompatActivity {
         arrivalDate = bundle.getString("arrival_date");
         birthDate = bundle.getString("birth_date");
         flag = bundle.getString("flag");
+        connectivity = bundle.getString("connectivity");
         reference_number.setText(referenceNumber);
         passport_number.setText(passportNumber);
         applicant_name.setText(applicantName);
