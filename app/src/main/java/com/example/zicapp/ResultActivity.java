@@ -280,8 +280,8 @@ public class ResultActivity extends AppCompatActivity {
         TextView description = checkedOutDialog.findViewById(R.id.desc_text);
         MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
 
-        message.setText("Valid Certificate");
-        applicant_name.setText("Verification Successfully");
+        message.setText("SUCCESSFULLY");
+        applicant_name.setText("CHECKIN");
         description.setText("Reference " + checkinReference);
 
         String scannedDate = dateFormatter.format(date);
@@ -307,8 +307,8 @@ public class ResultActivity extends AppCompatActivity {
         TextView description = checkedOutDialog.findViewById(R.id.desc_text);
         MaterialButton dismissButton = checkedOutDialog.findViewById(R.id.agree_button);
 
-        message.setText("Valid Certificate");
-        applicant_name.setText("Checkout Successfully");
+        message.setText("SUCCESSFULLY");
+        applicant_name.setText("CHECKOUT");
         description.setText("Reference " + checkoutReference);
 
         String scannedDate = dateFormatter.format(date);

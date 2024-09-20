@@ -93,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
         requestDAO = new RequestDAO(this);
         requestDAO.open();
 
-        syncCertificatesOfflineRequest();
+        syncArrivalCertificatesOfflineRequest();
         syncDepartureCertificatesOfflineRequest();
 
         prepareData();
@@ -197,7 +197,7 @@ public class HomeActivity extends AppCompatActivity {
                         System.out.println("Qr Code data = " + data);
                         assert data != null;
                         String passedData = Config.removeDoubleQuotes(data);
-                        if(passedData.startsWith("IA") || passedData.startsWith("ZIC")) {
+                        if(passedData.startsWith("ZIC")) {
                             JSONObject applicationData = offlineDB.getApplication(Config.removeDoubleQuotes(data));
                             System.out.println("Offline certificate on arrival " + applicationData);
                             if(applicationData.length() == 0){
@@ -205,9 +205,9 @@ public class HomeActivity extends AppCompatActivity {
                             } else {
                                 offlineArrivalSearchCertificateReference(data);
                             }
-                        }
-                        }else {
+                        } else {
                             showSnackBar("Invalid Qr Code");
+                        }
                         }
                     }
             }
@@ -224,7 +224,7 @@ public class HomeActivity extends AppCompatActivity {
                         System.out.println("Qr Code data = " + data);
                         assert data != null;
                         String passedData = Config.removeDoubleQuotes(data);
-                        if(passedData.startsWith("IA") || passedData.startsWith("ZIC")){
+                        if(passedData.startsWith("ZIC")){
                             JSONObject applicationData = offlineDB.getApplication(Config.removeDoubleQuotes(data));
                             System.out.println("Offline certificate " + applicationData);
                             if(applicationData.length() == 0){
@@ -401,12 +401,14 @@ public class HomeActivity extends AppCompatActivity {
 
                             if(Objects.equals(applicationStatus, "Expired")){
                                 showErrorDialog("The Insurance certificate has expired");
-                            }else if(todayDate.isBefore(insuranceStartDate)){
-                                    showAttentionDialog("Insurance is not active until " + arrivalDate);
-                            }else if(Objects.equals(applicationStatus, "In Use")){
+                            }
+//                            else if(todayDate.isBefore(insuranceStartDate)){
+//                                    showAttentionDialog("Insurance is not active until " + arrivalDate);
+//                            }
+                            else if(Objects.equals(applicationStatus, "In Use")){
                                 showAttentionDialog("The visitor has already scanned on arrival");
                             }else if(Objects.equals(applicationStatus, "Seized")){
-                                showAttentionDialog("The visitor has already scanned on departure");
+                                showAttentionDialog("Visitor already depart");
                             } else {
                                     Bundle bundle = new Bundle();
                                     bundle.putString(Config.INCOMING_TAG, tag);
@@ -465,6 +467,7 @@ public class HomeActivity extends AppCompatActivity {
     // Offline Method for verify Qr Code for searchCertificateReference
     private void offlineArrivalSearchCertificateReference(String data) {
         JSONObject applicationData =  offlineDB.getApplication(Config.removeDoubleQuotes(data));
+        System.out.println("Offline data on arrival scan: " + applicationData);
         try {
             String name = applicationData.getString("name");
             String reference_number = applicationData.getString("reference_number");
@@ -478,22 +481,27 @@ public class HomeActivity extends AppCompatActivity {
 
             LocalDate insuranceStartDate = LocalDate.parse(arrival_date);
 
-            if(application_status.equals("Expired")){
-                showErrorDialog("The Insurance certificate has expired");
-            }else if(application_status.equals("In Use")){
+            switch (application_status) {
+                case "Expired":
+                    showErrorDialog("The Insurance certificate has expired");
+                    break;
+                case "In Use":
                     showErrorDialog("The Visitor has already scanned on arrival");
-            }else if(application_status.equals("Seized")){
-                showErrorDialog("The Visitor has already scanned on departure");
-            }else if(todayDate.isBefore(insuranceStartDate)){
-                showAttentionDialog("The Insurance is not active until " + arrival_date);
-            }else{
+                    break;
+                case "Seized":
+                    showErrorDialog("Visitor already depart");
+                    break;
+//            else if(todayDate.isBefore(insuranceStartDate)){
+//                showAttentionDialog("The Insurance is not active until " + arrival_date);
+//            }
+                default:
                     Bundle bundle = new Bundle();
                     bundle.putString(Config.INCOMING_TAG, tag);
                     bundle.putString("applicant_name", name);
                     bundle.putString("reference_number", reference_number);
                     bundle.putString("nationality", nationality);
-                    bundle.putString("arrival_date",arrival_date);
-                    bundle.putString("birth_date",birth_date);
+                    bundle.putString("arrival_date", arrival_date);
+                    bundle.putString("birth_date", birth_date);
                     bundle.putString("passport_number", passport_number);
                     bundle.putString("application_status", application_status);
                     bundle.putString("flag", "Arrival");
@@ -503,7 +511,8 @@ public class HomeActivity extends AppCompatActivity {
                     intent.putExtras(bundle);
                     intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                }
+                    break;
+            }
 
         } catch (JSONException exception) {
             Log.e("Error", exception.getMessage());
@@ -512,11 +521,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     // Method to sync the offline request to online
-    private void syncCertificatesOfflineRequest() {
+    private void syncArrivalCertificatesOfflineRequest() {
         if(isOnline(this)){
-            List<OfflineCertificatesRequest> requests = requestDAO.getAllRequests();
+            List<OfflineCertificatesRequest> requests = requestDAO.getArrivalRequests();
             for(OfflineCertificatesRequest request : requests ) {
-                 sendCertificatesOfflineRequest(request);
+                 sendArrivalCertificatesOfflineRequest(request);
             }
         }
     }
@@ -524,7 +533,7 @@ public class HomeActivity extends AppCompatActivity {
     // Method to sync the offline request to online
     private void syncDepartureCertificatesOfflineRequest() {
         if(isOnline(this)){
-            List<OfflineDepartureRequest> requests = requestDAO.getDepartureAllRequests();
+            List<OfflineDepartureRequest> requests = requestDAO.getDepartureRequests();
             for(OfflineDepartureRequest request : requests ) {
                 departureSendCertificatesOfflineRequest(request);
             }
@@ -532,10 +541,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     // Request to send arrival data to API when device comes ONLINE
-    private void sendCertificatesOfflineRequest(OfflineCertificatesRequest request) {
+    private void sendArrivalCertificatesOfflineRequest(OfflineCertificatesRequest request) {
         StringRequest certificateRequest = new StringRequest(Request.Method.POST, Config.MARK_IN_USE,
                 response -> {
-                    System.out.println("Request = " + request);
+                    System.out.println("Arrival Offline Request = " + request);
                    Log.e("CERTIFICATE RESPONSE: ", String.valueOf(response));
                    try{
                        JSONObject jsonObject = new JSONObject(String.valueOf(response));
@@ -547,7 +556,7 @@ public class HomeActivity extends AppCompatActivity {
                            JSONObject certificateDetails = jsonObject.getJSONObject("data");
 
                            Log.e("CERTIFICATE OFFLINE DETAILS: ", String.valueOf(certificateDetails));
-                           requestDAO.deleteRequest(request.getId());
+                           requestDAO.deleteArrivalRequest(request.getId());
                            System.out.println("DATA SENT OFFLINE SUCCESSFULLY");
                        }else {
 
@@ -587,7 +596,7 @@ public class HomeActivity extends AppCompatActivity {
     private void departureSendCertificatesOfflineRequest(OfflineDepartureRequest request) {
         StringRequest certificateRequest = new StringRequest(Request.Method.POST, Config.MARK_SEIZED,
                 response -> {
-                    System.out.println("Request = " + request);
+                    System.out.println("Departure offline Request = " + request);
                     Log.e("OFFLINE DEPARTURE SYNC CERTIFICATE RESPONSE: ", String.valueOf(response));
                     try{
                         JSONObject jsonObject = new JSONObject(String.valueOf(response));
@@ -665,10 +674,12 @@ public class HomeActivity extends AppCompatActivity {
                             if(Objects.equals(applicationStatus, "Expired")){
                                 showAttentionDepartureDialog("The Insurance certificate has already expired");
                             }else if(Objects.equals(applicationStatus, "Seized")){
-                                showAttentionDepartureDialog("The visitor has already scanned on departure");
-                            }else if(todayDate.isBefore(insuranceStartDate)){
-                                showAttentionDepartureDialog("The Insurance is not active until " + arrivalDate);
-                            } else if(Objects.equals(applicationStatus, "In Use")) {
+                                showAttentionDepartureDialog("Visitor already depart");
+                            }
+//                            else if(todayDate.isBefore(insuranceStartDate)){
+//                                showAttentionDepartureDialog("The Insurance is not active until " + arrivalDate);
+//                            }
+                            else if(Objects.equals(applicationStatus, "In Use")) {
                                 Bundle bundle = new Bundle();
                                 bundle.putString(Config.INCOMING_TAG, tag);
                                 bundle.putString("applicant_name", applicantName);
@@ -742,31 +753,37 @@ public class HomeActivity extends AppCompatActivity {
 
             LocalDate insuranceStartDate = LocalDate.parse(arrival_date);
 
-            if(application_status.equals("Expired")){
-                showAttentionDepartureDialog("Insurance certificate expired");
-            }else if(application_status.equals("Seized")){
-                showAttentionDepartureDialog("Visitor already depart");
-            }else if(todayDate.isBefore(insuranceStartDate)){
-                showAttentionDepartureDialog("Your insurance will be active on " + arrival_date);
-            }else if(application_status.equals("In Use")){
-                Bundle bundle = new Bundle();
-                bundle.putString(Config.INCOMING_TAG, tag);
-                bundle.putString("applicant_name", name);
-                bundle.putString("reference_number", reference_number);
-                bundle.putString("nationality", nationality);
-                bundle.putString("arrival_date",arrival_date);
-                bundle.putString("birth_date",birth_date);
-                bundle.putString("passport_number", passport_number);
-                bundle.putString("application_status", application_status);
-                bundle.putString("flag", "Departure");
-                bundle.putString("connectivity", "offline");
+            switch (application_status) {
+                case "Expired":
+                    showAttentionDepartureDialog("Insurance certificate expired");
+                    break;
+                case "Seized":
+                    showAttentionDepartureDialog("Visitor already depart");
+                    break;
+//            else if(todayDate.isBefore(insuranceStartDate)){
+//                showAttentionDepartureDialog("Your insurance will be active on " + arrival_date);
+//            }
+                case "In Use":
+                    Bundle bundle = new Bundle();
+                    bundle.putString(Config.INCOMING_TAG, tag);
+                    bundle.putString("applicant_name", name);
+                    bundle.putString("reference_number", reference_number);
+                    bundle.putString("nationality", nationality);
+                    bundle.putString("arrival_date", arrival_date);
+                    bundle.putString("birth_date", birth_date);
+                    bundle.putString("passport_number", passport_number);
+                    bundle.putString("application_status", application_status);
+                    bundle.putString("flag", "Departure");
+                    bundle.putString("connectivity", "offline");
 
-                Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
-                intent.putExtras(bundle);
-                intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            } else {
-                showAttentionDepartureDialog("The visitor has not scanned upon arrival");
+                    Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
+                    intent.putExtras(bundle);
+                    intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    break;
+                default:
+                    showAttentionDepartureDialog("The visitor has not scanned upon arrival");
+                    break;
             }
 
         } catch (JSONException exception) {

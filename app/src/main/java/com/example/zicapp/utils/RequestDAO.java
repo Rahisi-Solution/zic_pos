@@ -9,14 +9,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+// The class to store offline requests to be sync online later
 public class RequestDAO {
     private SQLiteOpenHelper dbHelper;
     private SQLiteDatabase database;
     private SQLiteDatabase departureDatabase;
 
-    public RequestDAO(Context context) {
-        dbHelper = new DatabaseHelper(context);
-    }
+    public RequestDAO(Context context) { dbHelper = new DatabaseHelper(context); }
 
     public void open() {
         database = dbHelper.getWritableDatabase();
@@ -26,6 +25,7 @@ public class RequestDAO {
         dbHelper.close();
     }
 
+    // A function to add arrival certificate offline in order to sync later
     public void addCertificateRequest(String authToken, String referenceNumber){
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_AUTH_TOKEN, authToken);
@@ -33,6 +33,7 @@ public class RequestDAO {
         database.insert(DatabaseHelper.CERTIFICATES_TABLE, null, values);
     }
 
+    // A function to add departure certificate offline in order to sync later
     public void addDepartureRequest(String authToken, String referenceNumber){
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.DEPARTURE_COLUMN_AUTH_TOKEN, authToken);
@@ -40,7 +41,8 @@ public class RequestDAO {
         database.insert(DatabaseHelper.DEPARTURE_TABLE, null, values);
     }
 
-    public List<OfflineCertificatesRequest> getAllRequests(){
+    // List of offline arrival certificate scanned in form of array
+    public List<OfflineCertificatesRequest> getArrivalRequests(){
         List<OfflineCertificatesRequest> requests = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.CERTIFICATES_TABLE,
                 null, null, null, null, null, null);
@@ -61,7 +63,8 @@ public class RequestDAO {
         return requests;
     }
 
-    public List<OfflineDepartureRequest> getDepartureAllRequests(){
+    // List of offline departure certificate scanned in form of array
+    public List<OfflineDepartureRequest> getDepartureRequests(){
         List<OfflineDepartureRequest> requests = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.DEPARTURE_TABLE,
                 null, null, null, null, null, null);
@@ -81,9 +84,12 @@ public class RequestDAO {
         return requests;
     }
 
-    public void deleteRequest(long id) {
+    // Function to delete offline arrival certificate after sync
+    public void deleteArrivalRequest(long id) {
         database.delete(DatabaseHelper.CERTIFICATES_TABLE, DatabaseHelper.COLUMN_ID + "= ?", new String[]{String.valueOf(id)});
     }
+
+    // Function to delete offline departure certificate after sync
     public void deleteDepartureRequest(long id) {
         database.delete(DatabaseHelper.DEPARTURE_TABLE, DatabaseHelper.DEPARTURE_COLUMN_ID + "= ?", new String[]{String.valueOf(id)});
     }
