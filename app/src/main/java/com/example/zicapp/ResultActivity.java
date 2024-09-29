@@ -117,6 +117,7 @@ public class ResultActivity extends AppCompatActivity {
         });
     }
 
+    // Preparing data for result summary
     private void prepareData(){
         SharedPreferences preferences = ResultActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         Bundle bundle = null;

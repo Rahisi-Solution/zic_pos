@@ -27,18 +27,36 @@ public class RequestDAO {
 
     // A function to add arrival certificate offline in order to sync later
     public void addCertificateRequest(String authToken, String referenceNumber){
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COLUMN_AUTH_TOKEN, authToken);
-        values.put(DatabaseHelper.COLUMN_REFERENCE_NUMBER, referenceNumber);
-        database.insert(DatabaseHelper.CERTIFICATES_TABLE, null, values);
+        try{
+            database.beginTransaction();
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COLUMN_AUTH_TOKEN, authToken);
+            values.put(DatabaseHelper.COLUMN_REFERENCE_NUMBER, referenceNumber);
+            database.insert(DatabaseHelper.CERTIFICATES_TABLE, null, values);
+            database.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            database.endTransaction();
+            database.close();
+        }
     }
 
     // A function to add departure certificate offline in order to sync later
     public void addDepartureRequest(String authToken, String referenceNumber){
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.DEPARTURE_COLUMN_AUTH_TOKEN, authToken);
-        values.put(DatabaseHelper.DEPARTURE_COLUMN_REFERENCE_NUMBER, referenceNumber);
-        database.insert(DatabaseHelper.DEPARTURE_TABLE, null, values);
+        try{
+            database.beginTransaction();
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.DEPARTURE_COLUMN_AUTH_TOKEN, authToken);
+            values.put(DatabaseHelper.DEPARTURE_COLUMN_REFERENCE_NUMBER, referenceNumber);
+            database.insert(DatabaseHelper.DEPARTURE_TABLE, null, values);
+            database.setTransactionSuccessful();
+        }catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            database.endTransaction();
+            database.close();
+        }
     }
 
     // List of offline arrival certificate scanned in form of array

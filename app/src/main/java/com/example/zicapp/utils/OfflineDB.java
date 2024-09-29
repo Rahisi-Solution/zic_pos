@@ -174,6 +174,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery(query, null);
         int count = cursor.getCount();
         cursor.close();
+        database.close();
         return count;
     }
 
@@ -186,6 +187,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery(query, null);
         int count = cursor.getCount();
         cursor.close();
+        database.close();
         return count;
     }
 
@@ -198,6 +200,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery(query, null);
         int count = cursor.getCount();
         cursor.close();
+        database.close();
         return count;
     }
 
@@ -210,6 +213,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         Cursor cursor = database.rawQuery(query, null);
         int count = cursor.getCount();
         cursor.close();
+        database.close();
         return count;
     }
 
@@ -245,6 +249,7 @@ public class OfflineDB extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
         cursor.close();
+        database.close();
         Log.d("First Certificate", String.valueOf(firstCertificate));
         return firstCertificate;
     }
@@ -281,6 +286,7 @@ public class OfflineDB extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
         cursor.close();
+        database.close();
         Log.d("Last Certificate", String.valueOf(lastCertificate));
         return lastCertificate;
     }
@@ -313,6 +319,7 @@ public class OfflineDB extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
         cursor.close();
+        database.close();
         Log.e("Got Application", String.valueOf(applicationObject));
         return applicationObject;
     }
@@ -344,7 +351,40 @@ public class OfflineDB extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
         cursor.close();
+        database.close();
         Log.e("Got Certificate", String.valueOf(applicationObject));
+        return applicationObject;
+    }
+
+    public JSONObject getDepartureCertificate(String reference_number) {
+        String query = "SELECT * FROM departure_certificate WHERE reference_number='" + reference_number +"'";
+        SQLiteDatabase database = this.getWritableDatabase();
+        Cursor cursor = database.rawQuery(query, null);
+        JSONObject applicationObject = new JSONObject();
+
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            int totalColumn = cursor.getColumnCount();
+
+            for (int i = 0; i < totalColumn; i++) {
+                if (cursor.getColumnName(i) != null) {
+                    try {
+                        if(cursor.getString(i) != null) {
+                            applicationObject.put(cursor.getColumnName(i), cursor.getString(i));
+                        } else {
+                            applicationObject.put(cursor.getColumnName(i), "");
+                        }
+                    } catch (Exception exception) {
+                        Log.e("Error", Objects.requireNonNull(exception.getMessage()));
+                    }
+                }
+            }
+            cursor.moveToNext();
+        }
+        cursor.close();
+        database.close();
+        Log.e("Got Departure Certificate", String.valueOf(applicationObject));
         return applicationObject;
     }
 
@@ -370,9 +410,9 @@ public class OfflineDB extends SQLiteOpenHelper {
     }
 
     public void updateCertificateStatusToInUse(String certificateNumber, String status) {
+        SQLiteDatabase database = this.getWritableDatabase();
         try {
             String updateQuery = "UPDATE applications SET application_status = '" + status + "' WHERE TRIM(reference_number)='" + certificateNumber +"'";
-            SQLiteDatabase database = this.getWritableDatabase();
             System.out.println("Update Application status👍: " + updateQuery);
             Log.e("Update Application status", updateQuery);
             database.execSQL(updateQuery);
@@ -380,16 +420,18 @@ public class OfflineDB extends SQLiteOpenHelper {
             System.out.println("Update Status Error👎: " + e.getMessage());
             Log.e("Update Status Error", e.getMessage());
         }
+        database.close();
     }
 
     public void updateCertificateStatusToSeized(String certificateNumber, String status) {
+        SQLiteDatabase database = this.getWritableDatabase();
         try {
             String updateQuery = "UPDATE applications SET application_status = '" + status + "' WHERE TRIM(reference_number)='" + certificateNumber +"'";
-            SQLiteDatabase database = this.getWritableDatabase();
             Log.i("Update Application status", updateQuery);
             database.execSQL(updateQuery);
         } catch (SQLException e) {
             Log.e("Update Tonnage Error", e.getMessage());
         }
+        database.close();
     }
 }
