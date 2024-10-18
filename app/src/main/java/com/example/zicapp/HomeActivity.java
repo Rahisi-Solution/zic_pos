@@ -202,7 +202,7 @@ public class HomeActivity extends AppCompatActivity {
                                 if(isOnline(this)){
                                     onlineArrivalSearchCertificateReference(data);
                                 } else {
-                                    showSnackBar("Check the network please or login again");
+                                    showSnackBar("Check the network connection");
                                 }
                             } else {
                                 JSONObject scannedCertificate =  offlineDB.getCertificate(Config.removeDoubleQuotes(data));
@@ -246,7 +246,7 @@ public class HomeActivity extends AppCompatActivity {
                                 if(isOnline(this)){
                                     onlineDepartureSearchCertificateReference(data);
                                 } else {
-                                    showSnackBar("Check the network please");
+                                    showSnackBar("Check the network connection");
                                 }
                             } else {
                                 JSONObject scannedCertificate =  offlineDB.getDepartureCertificate(Config.removeDoubleQuotes(data));
@@ -449,6 +449,19 @@ public class HomeActivity extends AppCompatActivity {
                                     bundle.putString("application_status", applicationStatus);
                                     bundle.putString("flag", "Arrival");
                                     bundle.putString("connectivity", "offline");
+
+                                JSONObject _applicationObject = new JSONObject();
+                                _applicationObject.put("name", applicantName);
+                                _applicationObject.put("reference_number", referenceNumber);
+                                _applicationObject.put("nationality", nationality);
+                                _applicationObject.put("arrival_date",  arrivalDate);
+                                _applicationObject.put("birth_date",  birthDate);
+                                _applicationObject.put("passport_number", passportNumber);
+                                _applicationObject.put("application_status", applicationStatus);
+
+                                Log.e("Inserted Applications", String.valueOf(_applicationObject));
+                                offlineDB.insertApplications(_applicationObject);
+
                                     Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
                                     intent.putExtras(bundle);
                                     intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
@@ -485,7 +498,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         };
         RequestQueue queue = Volley.newRequestQueue(this);
-        request.setRetryPolicy(new DefaultRetryPolicy(4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        request.setRetryPolicy(new DefaultRetryPolicy(40000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
 
     }
@@ -599,7 +612,7 @@ public class HomeActivity extends AppCompatActivity {
                    }
         };
         RequestQueue queue = Volley.newRequestQueue(this);
-        certificateRequest.setRetryPolicy(new DefaultRetryPolicy (4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        certificateRequest.setRetryPolicy(new DefaultRetryPolicy (40000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(certificateRequest);
     }
 
@@ -651,7 +664,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         };
         RequestQueue queue = Volley.newRequestQueue(this);
-        certificateRequest.setRetryPolicy(new DefaultRetryPolicy (4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        certificateRequest.setRetryPolicy(new DefaultRetryPolicy (40000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(certificateRequest);
     }
 
@@ -700,6 +713,18 @@ public class HomeActivity extends AppCompatActivity {
                                 bundle.putString("flag", "Departure");
                                 bundle.putString("connectivity", "online");
 
+                                JSONObject _applicationObject = new JSONObject();
+                                _applicationObject.put("name", applicantName);
+                                _applicationObject.put("reference_number", referenceNumber);
+                                _applicationObject.put("nationality", nationality);
+                                _applicationObject.put("arrival_date",  arrivalDate);
+                                _applicationObject.put("birth_date",  birthDate);
+                                _applicationObject.put("passport_number", passportNumber);
+                                _applicationObject.put("application_status", applicationStatus);
+
+                                Log.e("Inserted Applications", String.valueOf(_applicationObject));
+                                offlineDB.insertApplications(_applicationObject);
+
                                 Intent intent = new Intent(HomeActivity.this, ResultActivity.class);
                                 intent.putExtras(bundle);
                                 intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
@@ -737,7 +762,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         };
         RequestQueue queue = Volley.newRequestQueue(this);
-        request.setRetryPolicy(new DefaultRetryPolicy(4000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        request.setRetryPolicy(new DefaultRetryPolicy(40000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
 
     }
