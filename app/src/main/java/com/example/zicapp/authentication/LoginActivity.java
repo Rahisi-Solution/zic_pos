@@ -46,9 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog loginProgress;
     TextInputEditText officerNumber;
     TextInputEditText officerPIN;
-
     boolean logged_in = false;
-
     private final LoginActivity context = LoginActivity.this;
 
     @Override
@@ -65,10 +63,10 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(view -> {
             if(String.valueOf(officerNumber.getText()).trim().isEmpty()) {
                 showSnackBar("Please Enter Officer Number");
-                Log.e(Config.LOG_TAG, "Enter number");
+                System.out.println("Enter number:" + Config.LOG_TAG);
             } else if (String.valueOf(officerPIN.getText()).trim().isEmpty()) {
                 showSnackBar("Please Enter Officer PIN");
-                Log.e(Config.LOG_TAG, "Enter pin");
+                System.out.println("Enter pin:" + Config.LOG_TAG);
             } else {
                 if(isOnline(this)){
                     loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
@@ -84,10 +82,10 @@ public class LoginActivity extends AppCompatActivity {
                 hideOnScreenKeyboard();
                 if(String.valueOf(officerNumber.getText()).trim().isEmpty()) {
                     showSnackBar("Please Enter Officer Number");
-                    Log.e(Config.LOG_TAG, "Enter number");
+                    System.out.println("Enter number:" + Config.LOG_TAG);
                 } else if (String.valueOf(officerPIN.getText()).trim().isEmpty()) {
                     showSnackBar("Please Enter Officer PIN");
-                    Log.e(Config.LOG_TAG, "Enter pin");
+                    System.out.println("Enter pin:" + Config.LOG_TAG);
                 } else {
                     if(isOnline(this)){
                         loginRequest(String.valueOf(officerNumber.getText()), String.valueOf(officerPIN.getText()));
@@ -109,7 +107,6 @@ public class LoginActivity extends AppCompatActivity {
     // Check Device internet connectivity
     public static boolean isOnline(Context context){
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
-
         if(connectivityManager != null) {
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             return activeNetwork != null && activeNetwork.isConnected();
@@ -124,16 +121,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginRequest(String officer_number, String officer_pin) {
-        Log.e(Config.LOG_TAG, officer_number);
-        Log.e(Config.LOG_TAG, officer_pin);
+        System.out.println("Enter number:" + officer_number);
+        System.out.println("Enter pin:" + officer_pin);
 
         loginProgress = ProgressDialog.show(LoginActivity.this, "Processing", "Please wait...");
 
         StringRequest request = new StringRequest(Request.Method.POST, Config.OFFICER_LOGIN,
                 response -> {
                     loginProgress.dismiss();
-                    Log.e("Login Response: ", response);
-
+                    System.out.println("Login Response:" + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONObject officerResponse = jsonObject.getJSONObject("response");
@@ -154,9 +150,8 @@ public class LoginActivity extends AppCompatActivity {
                                 String entrypoint = userDetails.getString("entrypoint");
                                 JSONArray applications = userDetails.getJSONArray("applications");
 
-                                Log.e("APPLICATIONS", String.valueOf(applications));
+                                System.out.println("Login Applications:" + applications);
 
-//                                 saveApplications(applications);
                                 saveApplicationsAsync(applications);
 
                                 SharedPreferences preferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -191,7 +186,7 @@ public class LoginActivity extends AppCompatActivity {
                     loginProgress.dismiss();
                     try {
                         if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
-                            System.out.println("The error HERE = " + error);
+                            System.out.println("The error HERE: " + error);
                             showSnackBar("Network Error please check your Internet Bundle");
                         } else {
                             showSnackBar(String.valueOf(error));
@@ -238,7 +233,6 @@ public class LoginActivity extends AppCompatActivity {
                     String passportNumber = applicationObject.getString("passport_number");
                     String birthDate = applicationObject.getString("birth_date");
                     String applicationStatus = applicationObject.getString("insuarance_status");
-//                    String insuranceStatus = applicationObject.getString("application_status");
 
                     JSONObject _applicationObject = new JSONObject();
                     _applicationObject.put("name", name);
@@ -249,11 +243,11 @@ public class LoginActivity extends AppCompatActivity {
                     _applicationObject.put("passport_number", passportNumber);
                     _applicationObject.put("application_status", applicationStatus);
 
-                    Log.e("Inserted Applications", String.valueOf(_applicationObject));
+                    System.out.println("Inserted Applications Offline:" + _applicationObject);
                     offlineDB.insertApplications(_applicationObject);
 
                 } catch (JSONException exception) {
-                    Log.e("APPLICATIONS LOOP", String.valueOf(exception));
+                    System.out.println("APPLICATIONS LOOP:" + exception);
                 }
             }
         }
@@ -282,7 +276,6 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         } else {
             System.out.println("Login False");
-//            showSnackBar("Logged in status: FALSE");
         }
     }
 

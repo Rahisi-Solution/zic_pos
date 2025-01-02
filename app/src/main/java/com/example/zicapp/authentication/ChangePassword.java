@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChangePassword extends AppCompatActivity {
-
     private ProgressDialog searchDialog;
     View parentLayout;
     String authToken;
@@ -97,7 +96,6 @@ public class ChangePassword extends AppCompatActivity {
     // Check Device internet connectivity
     public static boolean isOnline(Context context){
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
-
         if(connectivityManager != null) {
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             return activeNetwork != null && activeNetwork.isConnected();
@@ -110,7 +108,7 @@ public class ChangePassword extends AppCompatActivity {
     private void prepareData(){
         SharedPreferences preferences = ChangePassword.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         authToken = preferences.getString(Config.AUTH_TOKEN, "n.a");
-        System.out.println("Token " + authToken);
+        System.out.println("Token: " + authToken);
     }
 
     // Change PIN function
@@ -120,7 +118,7 @@ public class ChangePassword extends AppCompatActivity {
         StringRequest request = new StringRequest(Request.Method.POST, Config.CHANGE_PIN,
                 response -> {
                     searchDialog.dismiss();
-                    Log.e("Change password response ", response);
+                    System.out.println("Change password response : " + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONObject applicantResponse = jsonObject.getJSONObject("response");
@@ -140,7 +138,7 @@ public class ChangePassword extends AppCompatActivity {
                 error -> {
                     searchDialog.dismiss();
                     if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
-                        System.out.println("The error HERE = " + error);
+                        System.out.println("The error HERE :" + error);
                         showSnackBar("Network Error please check your Internet Bandwith");
                     } else {
                         showSnackBar(String.valueOf(error));

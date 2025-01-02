@@ -178,7 +178,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         return count;
     }
 
-    // Calculating Total Valid Certificates
+    // Calculating Total Invalid Certificates
     public int totalDepartureCertificates() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date today = new Date();
@@ -434,4 +434,20 @@ public class OfflineDB extends SQLiteOpenHelper {
         }
         database.close();
     }
+
+    public void clearCertificates() {
+        SQLiteDatabase database = this.getWritableDatabase();
+        try {
+            database.execSQL("DELETE FROM scanned_certificate");
+            database.execSQL("DELETE FROM departure_certificate");
+            database.execSQL("DELETE FROM failed_certificate");
+            database.execSQL("DELETE FROM failed_departure");
+            Log.i("OfflineDB", "All certificate records cleared successfully.");
+        } catch (SQLException e) {
+            Log.e("OfflineDB", "Error while clearing certificates: " + e.getMessage());
+        } finally {
+            database.close();
+        }
+    }
+
 }

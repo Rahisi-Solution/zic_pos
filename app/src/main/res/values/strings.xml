@@ -51,4 +51,5 @@
     <string name="attention">Attention</string>
     <string name="verification_failed">Verification Failed</string>
     <string name="error">Error</string>
+    <string name="qrcode_scan_success">Scan Success</string>
 </resources>

@@ -328,7 +328,6 @@
                     android:fontFamily="@font/rubik_regular"
                     android:textAllCaps="false"
                     android:textColor="@color/primary_color"/>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>

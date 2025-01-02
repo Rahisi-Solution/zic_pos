@@ -76,8 +76,8 @@ public class ReportActivity extends AppCompatActivity {
         entryPoint = preferences.getString(Config.ENTRYPOINT, "n.a");
         user_name.setText(username);
         entry_point.setText(entryPoint);
-        System.out.println(username);
-        System.out.println("Entry point on report " + entryPoint);
+        System.out.println("Entry username on report: " + username);
+        System.out.println("Entry point on report: " + entryPoint);
     }
 
     // Call the method to show today's date

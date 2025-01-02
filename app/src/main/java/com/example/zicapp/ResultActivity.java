@@ -104,7 +104,8 @@ public class ResultActivity extends AppCompatActivity {
                } else{
                    markSeized();
                }
-            } else {
+            }
+            else {
                 System.out.println("Verification is done " + connectivity);
                 if(Objects.equals(flag, "Arrival")){
                     saveCertificateOfflineRequest(authToken, referenceNumber);

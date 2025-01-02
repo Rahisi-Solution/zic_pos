@@ -93,7 +93,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         StringRequest request = new StringRequest(Request.Method.POST, Config.RESET_PIN,
                 response -> {
                     searchDialog.dismiss();
-                    Log.e("Reset password response ", response);
+                    System.out.println("Reset password response: " + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
                         JSONObject applicantResponse = jsonObject.getJSONObject("response");
@@ -113,7 +113,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 error -> {
                  searchDialog.dismiss();
                     if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
-                        System.out.println("The error HERE = " + error);
+                        System.out.println("The error HERE:" + error);
                         showSnackBar("Network Error please check your Internet Bandwith");
                     } else {
                         showSnackBar(String.valueOf(error));
