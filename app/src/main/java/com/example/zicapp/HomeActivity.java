@@ -249,6 +249,9 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (searchDialog != null && searchDialog.isShowing()) {
+            searchDialog.dismiss();
+        }
         if (isScannerOpen && mDecodeReader != null) {
             mDecodeReader.close();
             isScannerOpen = false;
@@ -515,11 +518,15 @@ public class HomeActivity extends AppCompatActivity {
 
     // Online Method for verify Qr Code for searchCertificateReference
     private void onlineArrivalSearchCertificateReference(String data){
+        if (!isFinishing() && !isDestroyed()) {
+            searchDialog = ProgressDialog.show(HomeActivity.this, "Processing", "Please wait...");
+        }
         System.out.println("Online Method for verify Qr Code for searchCertificateReference : " + data);
-        searchDialog = ProgressDialog.show(HomeActivity.this, "Processing", "Please wait...");
         StringRequest request = new StringRequest(Request.Method.POST, Config.GET_APPLICANT,
                 response -> {
-                    searchDialog.dismiss();
+                    if (searchDialog != null && searchDialog.isShowing()) {
+                        searchDialog.dismiss();
+                    }
                     System.out.println("Arrival scan Response: " + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
@@ -547,6 +554,8 @@ public class HomeActivity extends AppCompatActivity {
                                 showErrorDialog("Invalid, insurance dismissed");
                             }else if(Objects.equals(applicationStatus, "In Use")){
                                 showErrorDialog("The insurance certificate is currently In Use");
+                            }else if(Objects.equals(applicationStatus, "Pending Payment")){
+                                showErrorDialog("The applicant has not completed the payment");
                             }
                             else {
                                     Bundle bundle = new Bundle();
@@ -578,16 +587,17 @@ public class HomeActivity extends AppCompatActivity {
                                     intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
                                 }
-
                         } else {
                             showSnackBar("Failed to get Applicant: " + message);
                         }
-
                     } catch (JSONException exception) {
                         showSnackBar("Invalid qr code");
                     }
                 },
                 error -> {
+                    if (searchDialog != null && searchDialog.isShowing()) {
+                        searchDialog.dismiss();
+                    }
                     if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
                         showSnackBar("Network Error please check your Internet Bandwith");
                     } else {
@@ -602,7 +612,6 @@ public class HomeActivity extends AppCompatActivity {
                 params.put("reference_number", Config.removeDoubleQuotes(data));
                 return params;
             }
-
             @Override
             public String getBodyContentType() {
                 return "application/x-www-form-urlencoded";
@@ -611,7 +620,6 @@ public class HomeActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
         request.setRetryPolicy(new DefaultRetryPolicy(40000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
-
     }
 
     // Offline Method for verify Qr Code for searchCertificateReference
@@ -776,10 +784,14 @@ public class HomeActivity extends AppCompatActivity {
 
     // Online Method for verify Qr Code for searchCertificateReference on Departure
     private void onlineDepartureSearchCertificateReference(String data){
-        searchDialog = ProgressDialog.show(HomeActivity.this, "Processing", "Please wait...");
+        if (!isFinishing() && !isDestroyed()) {
+            searchDialog = ProgressDialog.show(HomeActivity.this, "Processing", "Please wait...");
+        }
         StringRequest request = new StringRequest(Request.Method.POST, Config.GET_APPLICANT,
                 response -> {
-                    searchDialog.dismiss();
+                    if (searchDialog != null && searchDialog.isShowing()) {
+                        searchDialog.dismiss();
+                    }
                     System.out.println("Departure ZIC scan Response: " + response);
                     try {
                         JSONObject jsonObject = new JSONObject(response);
@@ -846,6 +858,9 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 },
                 error -> {
+                    if (searchDialog != null && searchDialog.isShowing()) {
+                        searchDialog.dismiss();
+                    }
                     if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
                         System.out.println("The error HERE:" + error);
                         showSnackBar("Network Error please check your Internet Bandwith");
