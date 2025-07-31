@@ -1,6 +1,5 @@
 package com.example.zicapp;
 
-import static android.content.ContentValues.TAG;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -9,7 +8,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -22,6 +20,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -63,6 +62,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+
 public class HomeActivity extends AppCompatActivity {
     OfflineDB offlineDB = new OfflineDB(HomeActivity.this);
     SimpleDateFormat dateFormatter2 = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -97,6 +97,10 @@ public class HomeActivity extends AppCompatActivity {
     private boolean isScannerOpen = false;
     private WeakReference<HomeActivity> activityWeakReference;
     private static final String TAG = "HomeActivity";
+    private Handler syncHandler = new Handler();
+    private Runnable syncRunnable;
+    private static final long SYNC_INTERVAL = 5 * 60 * 1000;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -553,7 +557,7 @@ public class HomeActivity extends AppCompatActivity {
                             }else if(Objects.equals(applicationStatus, "Dismissed")){
                                 showErrorDialog("Invalid, insurance dismissed");
                             }else if(Objects.equals(applicationStatus, "In Use")){
-                                showErrorDialog("The insurance certificate is currently In Use");
+                                showErrorDialog("The Visitor Has Already Arrived Today");
                             }else if(Objects.equals(applicationStatus, "Pending Payment")){
                                 showErrorDialog("The applicant has not completed the payment");
                             }
