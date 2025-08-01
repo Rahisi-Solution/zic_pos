@@ -18,14 +18,34 @@
             android:id="@+id/app_logo"
             android:layout_width="90dp"
             android:layout_height="90dp"
-            android:layout_marginHorizontal="10dp"
+            android:layout_marginEnd="130dp"
             android:src="@drawable/zic_logo"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintEnd_toStartOf="@id/reset_visitor_btn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            android:paddingLeft="20dp"/>
+
+        <!-- Right: Reset Button -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/reset_visitor_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="@color/primary_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/app_logo"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:text="Reset Visitor Type"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

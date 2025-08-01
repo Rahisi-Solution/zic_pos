@@ -9,11 +9,13 @@ public class Config {
     /// public static final String ENDPOINT = "http://172.16.10.161:2002/pos/";
     // public static final String ENDPOINT = "http://172.16.10.161:2004/pos/"; // Vicent
 
-    // Online endPoint
+    // Demo endPoint
    public static final String ENDPOINT = "https://earrival.rahisi.co.tz/api/pos/";
 
     // Live endpoint
 //      public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
+
+    //public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
 
     public static final String OFFICER_LOGIN = ENDPOINT + "officer_login";
     public static final String GET_APPLICANT = ENDPOINT + "get_policy_applicant";

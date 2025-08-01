@@ -52,6 +52,7 @@ public class ResultActivity extends AppCompatActivity {
     TextView nationality;
     TextView arrival_date;
     TextView birth_date;
+    TextView insurance_status;
 
     private String userName;
     private String authToken;
@@ -61,8 +62,12 @@ public class ResultActivity extends AppCompatActivity {
     private String nationalities;
     private String arrivalDate;
     private String birthDate;
+    private String insuranceStatus;
     private String flag;
     private String connectivity;
+    private String tag;
+    private int scanFlag;
+    private int typeFlag;
 
     private ProgressDialog searchDialog;
     View parentLayout;
@@ -85,6 +90,7 @@ public class ResultActivity extends AppCompatActivity {
         nationality = findViewById(R.id.nationality);
         arrival_date = findViewById(R.id.arrival_date);
         birth_date = findViewById(R.id.birth_date);
+        insurance_status = findViewById(R.id.insurance_status);
         parentLayout = findViewById(android.R.id.content);
         prepareData();
         requestDAO = new RequestDAO(this);
@@ -99,13 +105,12 @@ public class ResultActivity extends AppCompatActivity {
         verify_button.setOnClickListener(v -> {
             if(Objects.equals(connectivity, "online")){
                 System.out.println("Verification is done " + connectivity);
-               if(Objects.equals(flag, "Arrival")){
-                   markVerified();
-               } else{
-                   markSeized();
-               }
-            }
-            else {
+                if(Objects.equals(flag, "Arrival")){
+                    markVerified();
+                } else{
+                    markSeized();
+                }
+            } else {
                 System.out.println("Verification is done " + connectivity);
                 if(Objects.equals(flag, "Arrival")){
                     saveCertificateOfflineRequest(authToken, referenceNumber);
@@ -132,14 +137,18 @@ public class ResultActivity extends AppCompatActivity {
         nationalities = bundle.getString("nationality");
         arrivalDate = bundle.getString("arrival_date");
         birthDate = bundle.getString("birth_date");
+        insuranceStatus = bundle.getString("application_status");
         flag = bundle.getString("flag");
         connectivity = bundle.getString("connectivity");
+        scanFlag = bundle.getInt("scan_flag");
+        typeFlag = bundle.getInt("type_flag");
         reference_number.setText(referenceNumber);
         passport_number.setText(passportNumber);
         applicant_name.setText(applicantName);
         nationality.setText(nationalities);
         arrival_date.setText(arrivalDate);
         birth_date.setText(birthDate);
+        insurance_status.setText(insuranceStatus);
     }
 
     private void markVerified(){
@@ -155,6 +164,7 @@ public class ResultActivity extends AppCompatActivity {
                         String code = applicantResponse.getString("code");
                         String message = applicantResponse.getString("message");
                         String checkinReference = applicantData.getString("checkin_reference");
+                        System.out.println("WE ARE VERIFYING AND CODE: 🥱 " + code);
 
                         if(code.equals("200")) {
                             showArrivalDialog(checkinReference);
@@ -168,7 +178,7 @@ public class ResultActivity extends AppCompatActivity {
                     }
                 },
                 error -> {
-                   searchDialog.dismiss();
+                    searchDialog.dismiss();
                     if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
                         System.out.println("The error HERE = " + error);
                         showSnackBar("Network Error please check your Internet Bundle");
@@ -182,7 +192,7 @@ public class ResultActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("authorization", "Bearer " + authToken);
                 params.put("reference_number", referenceNumber);
-                System.out.println("Parameters on mark in use: " + params);
+                System.out.println("Parameters on mark in use in result 😡: " + params);
                 return params;
             }
 
@@ -222,7 +232,7 @@ public class ResultActivity extends AppCompatActivity {
                     }
                 },
                 error -> {
-                   searchDialog.dismiss();
+                    searchDialog.dismiss();
                     if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
                         System.out.println("The error HERE = " + error);
                         showSnackBar("Network Error please check your Internet Bandwith");
@@ -290,8 +300,13 @@ public class ResultActivity extends AppCompatActivity {
         String scannedTime = timeFormatter.format(date);
         offlineDB.insertArrivalCertificate(referenceNumber, scannedDate, scannedTime);
         dismissButton.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(Config.INCOMING_TAG, tag);
+            bundle.putInt("scan_flag", scanFlag);
+            bundle.putInt("type_flag", typeFlag);
             checkedOutDialog.dismiss();
             Intent intent = new Intent(ResultActivity.this, HomeActivity.class);
+            intent.putExtras(bundle);
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });
@@ -317,8 +332,13 @@ public class ResultActivity extends AppCompatActivity {
         String scannedTime = timeFormatter.format(date);
         offlineDB.insertDepartureCertificate(referenceNumber, scannedDate, scannedTime);
         dismissButton.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(Config.INCOMING_TAG, tag);
+            bundle.putInt("scan_flag", scanFlag);
+            bundle.putInt("type_flag", typeFlag);
             checkedOutDialog.dismiss();
             Intent intent = new Intent(ResultActivity.this, HomeActivity.class);
+            intent.putExtras(bundle);
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="330dp"
+    android:layout_height="220dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary_color"
+        android:text="Choose type"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:padding="13dp"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:id="@+id/licence_validity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        android:text="International"
+        android:layout_marginHorizontal="10dp"
+        android:padding="13dp"
+        android:textSize="18sp"
+        app:backgroundTint="#588157"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0"
+        android:layout_marginTop="10dp"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:id="@+id/vehicle_sticker_validity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/licence_validity"
+        android:text="Domestic"
+        android:layout_marginHorizontal="10dp"
+        android:padding="13dp"
+        android:textSize="18sp"
+        app:backgroundTint="#e07a5f"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0"
+        android:layout_marginTop="10dp"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
