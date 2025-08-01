@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.provider.Settings.System.getString;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -18,9 +19,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.ToneGenerator;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -30,6 +35,7 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -184,10 +190,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void startArrivalCertificateScanning() {
+        playSound(R.raw.success_beep);
         if (mDecodeReader == null) {
             mDecodeReader = new DecodeReader(this);
         }
-        int baudRate = 115200;
+        int baudRate = 125200;
         int result = mDecodeReader.open(baudRate);
 
         if (result == ResultCode.SUCCESS) {
@@ -226,15 +233,30 @@ public class HomeActivity extends AppCompatActivity {
     private void handleArrivalScannedData(byte[] data) {
         String scannedData = new String(data, StandardCharsets.UTF_8);
         System.out.println("handleArrivalScannedData is done: " + scannedData);
-        String zicdata = Config.removeDoubleQuotes(scannedData);
-        onlineArrivalSearchCertificateReference(zicdata);
+        String zicData = Config.removeDoubleQuotes(scannedData);
+        JSONObject scannedCertificate =  offlineDB.getCertificate(Config.removeDoubleQuotes(zicData));
+        if(scannedCertificate.length() != 0){
+            try{
+                String dateScanned = scannedCertificate.getString("date");
+                String todayDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                if(dateScanned.equals(todayDate)){
+                    showErrorDialog("Visitor already arrived today");
+                }else {
+                    onlineArrivalSearchCertificateReference(zicData);
+                }
+            }catch(JSONException e){
+                throw new RuntimeException(e);
+            }
+        } else {
+            onlineArrivalSearchCertificateReference(zicData);
+        }
     }
 
     private void handleDepartureScannedData(byte[] data) {
         String scannedData = new String(data, StandardCharsets.UTF_8);
         System.out.println("handleDepartureScannedData is done: " + scannedData);
-        String zicdata = Config.removeDoubleQuotes(scannedData);
-        onlineDepartureSearchCertificateReference(zicdata);
+        String zicData = Config.removeDoubleQuotes(scannedData);
+        onlineDepartureSearchCertificateReference(zicData);
     }
 
     @Override
@@ -390,12 +412,7 @@ public class HomeActivity extends AppCompatActivity {
 
     /* Error dialog to show when scan certificate failed */
     private void showErrorDialog(String sms) {
-        HomeActivity activity = activityWeakReference.get();
-        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
-            return;
-        }
-
-        Dialog checkedOutDialog = new Dialog(activity);
+        checkedOutDialog = new Dialog(this);
         checkedOutDialog.setCanceledOnTouchOutside(false);
         checkedOutDialog.setContentView(R.layout.error_dialog);
 
@@ -414,17 +431,15 @@ public class HomeActivity extends AppCompatActivity {
         offlineDB.insertInvalidCertificate(referenceNumber, scannedDate, scannedTime);
 
         dismissButton.setOnClickListener(view -> {
+            System.out.println("TUNA DISMISS NOW");
             checkedOutDialog.dismiss();
-            activity.showSnackBar("Invalid Certificate");
-            Intent intent = new Intent(activity, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            activity.startActivity(intent);
+            Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
+            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         });
 
         checkedOutDialog.setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK);
-        if (!isFinishing()){
-            checkedOutDialog.show();
-        }
+        checkedOutDialog.show();
     }
 
     /* Error dialog to show when scan certificate failed */
@@ -552,8 +567,6 @@ public class HomeActivity extends AppCompatActivity {
                                 showErrorDialog("The Insurance certificate has expired");
                             }else if(Objects.equals(applicationStatus, "Dismissed")){
                                 showErrorDialog("Invalid, insurance dismissed");
-                            }else if(Objects.equals(applicationStatus, "In Use")){
-                                showErrorDialog("The insurance certificate is currently In Use");
                             }else if(Objects.equals(applicationStatus, "Pending Payment")){
                                 showErrorDialog("The applicant has not completed the payment");
                             }
@@ -592,6 +605,9 @@ public class HomeActivity extends AppCompatActivity {
                         }
                     } catch (JSONException exception) {
                         showSnackBar("Invalid qr code");
+                        Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
+                        intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                     }
                 },
                 error -> {
@@ -817,6 +833,10 @@ public class HomeActivity extends AppCompatActivity {
                                 showAttentionDepartureDialog("The Insurance certificate has already expired");
                             }else if(Objects.equals(applicationStatus, "Dismissed")){
                                 showErrorDialog("Invalid, insurance dismissed");
+                            }else if(Objects.equals(applicationStatus, "Departed")){
+                                showErrorDialog("Visitor already depart");
+                            }else if(Objects.equals(applicationStatus, "Pending Payment")){
+                                showErrorDialog("The applicant has not completed the payment");
                             }
                             else {
                                 Bundle bundle = new Bundle();
@@ -931,5 +951,14 @@ public class HomeActivity extends AppCompatActivity {
             System.out.println("Error:" + exception);
             showSnackBar("Invalid Qr code");
         }
+    }
+
+    private void playSound(int resId) {
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, resId);
+        mediaPlayer.setOnCompletionListener(mp -> {
+            mp.reset();
+            mp.release();
+        });
+        mediaPlayer.start();
     }
 }
