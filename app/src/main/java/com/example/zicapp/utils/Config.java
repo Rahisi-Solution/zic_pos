@@ -5,15 +5,15 @@ public class Config {
     public static final String LOG_TAG = "ZIC_APP";
 
     // Local endPoint
-    /// public static final String ENDPOINT = "http://172.16.10.165:7500/pos/";
+//    public static final String ENDPOINT = "http://172.16.10.165:7500/pos/";
     /// public static final String ENDPOINT = "http://172.16.10.161:2002/pos/";
     // public static final String ENDPOINT = "http://172.16.10.161:2004/pos/"; // Vicent
 
     // Demo endPoint
-   public static final String ENDPOINT = "https://earrival.rahisi.co.tz/api/pos/";
+//   public static final String ENDPOINT = "https://earrival.rahisi.co.tz/api/pos/";
 
     // Live endpoint
-//      public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
+      public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
 
     //public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
 
