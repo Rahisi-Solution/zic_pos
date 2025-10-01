@@ -35,6 +35,7 @@ import com.android.volley.toolbox.Volley;
 import com.common.apiutil.decode.DecodeReader;
 import com.example.zicapp.authentication.ChangePassword;
 import com.example.zicapp.authentication.LoginActivity;
+import com.example.zicapp.claimInspector.ClaimInspectorActivity;
 import com.example.zicapp.utils.Config;
 import com.example.zicapp.utils.OfflineCertificatesRequest;
 import com.example.zicapp.utils.OfflineDB;
@@ -52,12 +53,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
     MaterialButton logoutButton;
     Spinner spinner;
     View parentLayout;
     private  String entryPoint;
+    private  String inspectorType;
     TextView change_password;
     private RequestDAO requestDAO;
     SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -130,6 +133,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void prepareData() {
         SharedPreferences preferences = SettingsActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
          entryPoint = preferences.getString(Config.ENTRYPOINT, "n.a");
+         inspectorType = preferences.getString(Config.INSPECTOR_TYPE, "n.a");
     }
 
     // Method to sync the offline request to online
@@ -297,7 +301,12 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(SettingsActivity.this, HomeActivity.class);
+        Intent intent;
+        if(Objects.equals(inspectorType, "3")){
+            intent = new Intent(SettingsActivity.this, ClaimInspectorActivity.class);
+        }else {
+            intent = new Intent(SettingsActivity.this, HomeActivity.class);
+        }
         startActivity(intent);
         finish();
         super.onBackPressed();

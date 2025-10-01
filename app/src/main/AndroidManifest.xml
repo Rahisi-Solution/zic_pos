@@ -18,6 +18,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".claimInspector.ClaimResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".claimInspector.ClaimInspectorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".claimInspector.ClaimFormActivity"
+            android:exported="false" />
+        <activity
             android:name=".QrScannerLayoutActivity"
             android:exported="false" />
         <activity

@@ -155,7 +155,7 @@ public class HomeActivity extends AppCompatActivity {
         MaterialCardView departureCertificateScan = findViewById(R.id.departure_certificate_card);
         MaterialCardView reports = findViewById(R.id.report_card);
         MaterialCardView settings = findViewById(R.id.settings_card);
-//        MaterialCardView resetVisitor = findViewById(R.id.reset_visitor_btn);
+        MaterialCardView resetVisitor = findViewById(R.id.reset_visitor_btn);
 
         user_name.setText(username);
         System.out.println(username);
@@ -182,33 +182,38 @@ public class HomeActivity extends AppCompatActivity {
             System.out.println("POS MODEL " + Build.MODEL);
             if (Build.MODEL.equals("P8") || Build.MODEL.equals("GBK")) {
                 Bundle bundle = getIntent().getExtras();
-                startArrivalCertificateScanning();
+//                startArrivalCertificateScanning();
+                if(mDecodeReader == null){
+//                    System.out.println("HAPA " + mDecodeReader.equals(true));
+                }else {
+                    System.out.println("HUKU");
+                }
 
-//                if(scanFlag == 0){
-//                    if (bundle != null && bundle.containsKey("scan_flag")) {
-//                        scanFlag = bundle.getInt("scan_flag");
-//                    }
-//                    if(Objects.equals(entrypointId, String.valueOf(2)) || Objects.equals(entrypointId, String.valueOf(13))
-//                            || Objects.equals(entrypointId, String.valueOf(9)) || Objects.equals(entrypointId, String.valueOf(14))){
-//                        if(scanFlag == 0 ){
-//                            applicantDialog();
-//                        }else{
-//                            startArrivalCertificateScanning();
-//                        }
-//                    } else if(Objects.equals(entrypointId, String.valueOf(8)) || Objects.equals(entrypointId, String.valueOf(5)) ||
-//                            Objects.equals(entrypointId, String.valueOf(10))) {
-//                        typeFlag = 0;
-//                        System.out.println("Type flag ya domestic 👽 " + typeFlag);
-//                        startArrivalCertificateScanning();
-//                    } else {
-//                        typeFlag = 1;
-//                        System.out.println("Type flag ya international 🤖 " + typeFlag);
-//                        startArrivalCertificateScanning();
-//                    }
-//                } else {
-//                    System.out.println("Scan flag ya tatu " + scanFlag);
-//                    startArrivalCertificateScanning();
-//                }
+                if(scanFlag == 0){
+                    if (bundle != null && bundle.containsKey("scan_flag")) {
+                        scanFlag = bundle.getInt("scan_flag");
+                    }
+                    if(Objects.equals(entrypointId, String.valueOf(2)) || Objects.equals(entrypointId, String.valueOf(13))
+                            || Objects.equals(entrypointId, String.valueOf(9)) || Objects.equals(entrypointId, String.valueOf(14))){
+                        if(scanFlag == 0 ){
+                            applicantDialog();
+                        }else{
+                            startArrivalCertificateScanning();
+                        }
+                    } else if(Objects.equals(entrypointId, String.valueOf(8)) || Objects.equals(entrypointId, String.valueOf(5)) ||
+                            Objects.equals(entrypointId, String.valueOf(10))) {
+                        typeFlag = 0;
+                        System.out.println("Type flag ya domestic 👽 " + typeFlag);
+                        startArrivalCertificateScanning();
+                    } else {
+                        typeFlag = 1;
+                        System.out.println("Type flag ya international 🤖 " + typeFlag);
+                        startArrivalCertificateScanning();
+                    }
+                } else {
+                    System.out.println("Scan flag ya tatu " + scanFlag);
+                    startArrivalCertificateScanning();
+                }
             } else {
                 showSnackBar("Scan valid QR to proceed");
             }
@@ -217,26 +222,26 @@ public class HomeActivity extends AppCompatActivity {
         // Start Departure Certificate Scanning
         departureCertificateScan.setOnClickListener(view -> {
             System.out.println("POS MODEL " + Build.MODEL);
-            if (Build.MODEL.equals("P8") || Build.MODEL.equals("GBK")) {
-                startDepartureCertificateScanning();
-            } else {
-                showSnackBar("Scan valid QR to proceed");
-            }
+//            if (Build.MODEL.equals("P8") || Build.MODEL.equals("GBK")) {
+//                startDepartureCertificateScanning();
+//            } else {
+//                showSnackBar("Scan valid QR to proceed");
+//            }
         });
 
-//        resetVisitor.setOnClickListener(view->{
-//            Intent intent = new Intent(this, getClass());
-//            intent.putExtra("scan_flag", 0); // reset value
-//            startActivity(intent);
-//            finish();
-//        });
+        resetVisitor.setOnClickListener(view->{
+            Intent intent = new Intent(this, getClass());
+            intent.putExtra("scan_flag", 0); // reset value
+            startActivity(intent);
+            finish();
+        });
 
-//        if(Objects.equals(entrypointId, String.valueOf(2)) || Objects.equals(entrypointId, String.valueOf(13)) ||
-//                Objects.equals(entrypointId, String.valueOf(9)) || Objects.equals(entrypointId, String.valueOf(14))){
-//            resetVisitor.setVisibility(View.VISIBLE);
-//        }else {
-//            resetVisitor.setVisibility(View.GONE);
-//        }
+        if(Objects.equals(entrypointId, String.valueOf(2)) || Objects.equals(entrypointId, String.valueOf(13)) ||
+                Objects.equals(entrypointId, String.valueOf(9)) || Objects.equals(entrypointId, String.valueOf(14))){
+            resetVisitor.setVisibility(View.VISIBLE);
+        }else {
+            resetVisitor.setVisibility(View.GONE);
+        }
 
         activityWeakReference = new WeakReference<>(this);
     }
@@ -523,9 +528,13 @@ public class HomeActivity extends AppCompatActivity {
         offlineDB.insertInvalidCertificate(referenceNumber, scannedDate, scannedTime);
 
         dismissButton.setOnClickListener(view -> {
-            System.out.println("TUNA DISMISS NOW");
+            Bundle bundle = new Bundle();
+            bundle.putString(Config.INCOMING_TAG, tag);
+            bundle.putInt("scan_flag", 1);
             checkedOutDialog.dismiss();
+//            showSnackBar("Invalid Certificate");
             Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
+            intent.putExtras(bundle);
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });
@@ -881,6 +890,7 @@ public class HomeActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("authorization", "Bearer " + request.getAuthToken());
                 params.put("reference_number", request.getReferenceNumber());
+                params.put("applicant_travel_type", String.valueOf(typeFlag));
                 System.out.println("Parameters to send departure data " + params);
                 return params;
             }
@@ -990,6 +1000,7 @@ public class HomeActivity extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put("authorization", "Bearer " + authToken);
+                params.put("applicant_travel_type", String.valueOf(typeFlag));
                 params.put("reference_number", Config.removeDoubleQuotes(data));
                 return params;
             }

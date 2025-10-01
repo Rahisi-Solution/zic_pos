@@ -25,6 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.zicapp.HomeActivity;
 import com.example.zicapp.R;
+import com.example.zicapp.claimInspector.ClaimInspectorActivity;
 import com.example.zicapp.utils.Config;
 import com.example.zicapp.utils.OfflineDB;
 import com.google.android.material.button.MaterialButton;
@@ -47,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     TextInputEditText officerNumber;
     TextInputEditText officerPIN;
     boolean logged_in = false;
+    private String inspector_type;
     private final LoginActivity context = LoginActivity.this;
 
     @Override
@@ -139,35 +141,42 @@ public class LoginActivity extends AppCompatActivity {
                         if(code.equals("200")){
                             JSONObject userDetails = jsonObject.getJSONObject("user_details");
                             String inspectorType = userDetails.getString("inspector_type");
+                            splashRequest();
+
+                            String auth_token = userDetails.getString("token");
+                            String login_credential = userDetails.getString("login_credential_id");
+                            String user_id = userDetails.getString("user_id");
+                            String user_name = userDetails.getString("username");
+                            String domain = userDetails.getString("domain");
+                            String entrypoint_id = userDetails.getString("entrypoint_id");
+                            String entrypoint = userDetails.getString("entrypoint");
+                            JSONArray applications = userDetails.getJSONArray("applications");
+
+                            System.out.println("Login Applications:" + applications);
+
+                            saveApplicationsAsync(applications);
+
+                            SharedPreferences preferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferences.edit();
+
+                            editor.putString(Config.AUTH_TOKEN, auth_token);
+                            editor.putString(Config.LOGIN_CREDENTIAL, login_credential);
+                            editor.putString(Config.USER_ID, user_id);
+                            editor.putString(Config.USER_NAME, user_name);
+                            editor.putString(Config.DOMAIN, domain);
+                            editor.putString(Config.ENTRYPOINT_ID, entrypoint_id);
+                            editor.putString(Config.ENTRYPOINT, entrypoint);
+                            editor.putBoolean(Config.LOGGED_IN_PREF, true);
+                            editor.putString(Config.INSPECTOR_TYPE, inspectorType);
+                            editor.apply();
 
                             if(inspectorType.equals("2")) {
-                                String auth_token = userDetails.getString("token");
-                                String login_credential = userDetails.getString("login_credential_id");
-                                String user_id = userDetails.getString("user_id");
-                                String user_name = userDetails.getString("username");
-                                String domain = userDetails.getString("domain");
-                                String entrypoint_id = userDetails.getString("entrypoint_id");
-                                String entrypoint = userDetails.getString("entrypoint");
-                                JSONArray applications = userDetails.getJSONArray("applications");
-
-                                System.out.println("Login Applications:" + applications);
-
-                                saveApplicationsAsync(applications);
-
-                                SharedPreferences preferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = preferences.edit();
-
-                                editor.putString(Config.AUTH_TOKEN, auth_token);
-                                editor.putString(Config.LOGIN_CREDENTIAL, login_credential);
-                                editor.putString(Config.USER_ID, user_id);
-                                editor.putString(Config.USER_NAME, user_name);
-                                editor.putString(Config.DOMAIN, domain);
-                                editor.putString(Config.ENTRYPOINT_ID, entrypoint_id);
-                                editor.putString(Config.ENTRYPOINT, entrypoint);
-                                editor.putBoolean(Config.LOGGED_IN_PREF, true);
-                                editor.apply();
-
                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+
+                            }else if(inspectorType.equals("3")) {
+                                Intent intent = new Intent(LoginActivity.this, ClaimInspectorActivity.class);
                                 startActivity(intent);
                                 finish();
 
@@ -263,19 +272,88 @@ public class LoginActivity extends AppCompatActivity {
         snackbar.show();
     }
 
+    private void splashRequest() {
+
+        StringRequest request = new StringRequest(Request.Method.POST, Config.APP_SPLASH,
+                response -> {
+                    System.out.println("Splash Response: "+ response);
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONObject splashResponse = jsonObject.getJSONObject("response");
+                        String code = splashResponse.getString("code");
+                        String message = splashResponse.getString("message");
+
+                        if(code.equals("200")){
+                            JSONObject splashData = splashResponse.getJSONObject("data");
+                            JSONArray sites = splashData.getJSONArray("sites");
+                            JSONArray hospitals = splashData.getJSONArray("hospital");
+                            JSONArray complain = splashData.getJSONArray("complain");
+                            JSONArray accident_type = splashData.getJSONArray("accident_type");
+                            JSONArray repatriation_type = splashData.getJSONArray("repatriation_type");
+                            JSONArray repatriation_status= splashData.getJSONArray("repatriation_status");
+
+                            System.out.println("Hospitals: " + hospitals);
+
+
+                            SharedPreferences preferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString(Config.HOSPITALS, hospitals.toString());
+                            editor.putString(Config.COMPLAIN, complain.toString());
+                            editor.putString(Config.ACCIDENT_TYPE, accident_type.toString());
+                            editor.putString(Config.REPATRIATION_TYPE, repatriation_type.toString());
+                            editor.putString(Config.REPATRIATION_STATUS, repatriation_status.toString());
+                            editor.apply();
+
+                            System.out.println(Config.HOSPITALS);
+
+
+                        } else {
+                            System.out.println("Something happened " + message);
+                        }
+
+                    } catch (JSONException exception) {
+                        System.out.println("Exception: " + exception);
+                    }
+                },
+                error -> {
+                    try {
+                        if(String.valueOf(error).equals("com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"earrival.rahisi.co.tz\": No address associated with hostname")){
+                            System.out.println("The error HERE = " + error);
+                        } else {
+                        }
+                    } catch (Exception e) {
+                    }
+                }){
+
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        request.setRetryPolicy(new DefaultRetryPolicy(40000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(request);
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
         SharedPreferences preferences = getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
         logged_in = preferences.getBoolean(Config.LOGGED_IN_PREF, false);
+        inspector_type = preferences.getString(Config.INSPECTOR_TYPE, "n/a");
 
         if(logged_in) {
-            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            Intent intent;
+            if(inspector_type.equals("3")){
+                intent = new Intent(LoginActivity.this, ClaimInspectorActivity.class);
+            }else {
+                intent = new Intent(LoginActivity.this, HomeActivity.class);
+            }
             startActivity(intent);
             finish();
+
         } else {
             System.out.println("Login False");
+//            showSnackBar("Logged in status: FALSE");
         }
     }
 

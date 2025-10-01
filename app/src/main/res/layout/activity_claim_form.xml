@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".claimInspector.ClaimFormActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Complete the form below to submit insurance claim"
+                android:textColor="@color/primary_color"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/primary_color"
+                android:alpha="0.9"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="20dp"
+                />
+
+            <!--            <TextView-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:text="Hospital"-->
+            <!--                android:textSize="15sp"-->
+            <!--                android:layout_marginBottom="10dp"-->
+            <!--                android:fontFamily="@font/rubik_regular"-->
+            <!--                android:layout_gravity="start"-->
+            <!--                />-->
+
+            <!--            &lt;!&ndash; Hospital Dropdown &ndash;&gt;-->
+            <!--            <Spinner-->
+            <!--                android:id="@+id/spinner_hospital"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:background="@drawable/spinner_border"-->
+            <!--                android:spinnerMode="dropdown"-->
+            <!--                android:layout_marginBottom="15dp"/>-->
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Type Of Complain"
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                android:layout_gravity="start"
+                />
+
+            <!-- Complain Dropdown -->
+            <Spinner
+                android:id="@+id/spinner_complain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_border"
+                android:layout_marginBottom="15dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Case Type"
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                android:layout_gravity="start"
+                />
+
+            <!-- Accident Type Dropdown -->
+            <Spinner
+                android:id="@+id/spinner_accident_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_border"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Repatriation Status"
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                android:layout_gravity="start"
+                />
+
+            <!-- Repatriation Type Dropdown -->
+            <Spinner
+                android:id="@+id/spinner_repatriation_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_border"
+                android:layout_marginBottom="15dp"/>
+
+            <TextView
+                android:id="@+id/repatriation_type_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Repatriation Type"
+                android:visibility="gone"
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                android:layout_gravity="start"
+                />
+
+            <!-- Repatriation Status Dropdown (hidden by default) -->
+            <Spinner
+                android:id="@+id/spinner_repatriation_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_border"
+                android:visibility="gone"
+                android:layout_marginBottom="15dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Admission Number"
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                android:layout_gravity="start"
+                />
+
+            <!-- Admission Number -->
+            <EditText
+                android:id="@+id/input_admission_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Admission Number"
+                android:inputType="number"
+                android:background="@drawable/spinner_border"
+                android:layout_marginBottom="15dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of days"
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                android:layout_gravity="start"
+                />
+
+            <!-- Number of Days -->
+            <EditText
+                android:id="@+id/input_days"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_border"
+                android:hint="Enter number of days"
+                android:inputType="number"
+                android:layout_marginBottom="15dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comment"
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/rubik_regular"
+                android:layout_gravity="start"
+                />
+
+            <!-- Comment -->
+            <EditText
+                android:id="@+id/input_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_border"
+                android:hint="Enter Comment"
+                android:inputType="textMultiLine"
+                android:lines="3"
+                android:gravity="top"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- Submit Button -->
+            <Button
+                android:id="@+id/btn_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:text="Submit"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

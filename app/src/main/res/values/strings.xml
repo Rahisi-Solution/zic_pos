@@ -52,4 +52,8 @@
     <string name="verification_failed">Verification Failed</string>
     <string name="error">Error</string>
     <string name="qrcode_scan_success">Scan Success</string>
+    <string name="verify_passport">Verify Insurance</string>
+    <string name="hospital_inspector">Hospital Inspector</string>
+    <string name="total_claims">Total Claims:</string>
+    <string name="scan_travel_insurance">Scan Insurance QR Code</string>
 </resources>

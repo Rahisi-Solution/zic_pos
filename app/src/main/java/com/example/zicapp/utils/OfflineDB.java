@@ -33,6 +33,7 @@ public class OfflineDB extends SQLiteOpenHelper {
     String failed_departure;
     String checked_in;
     String applications;
+    String claims;
 
     // Creating Tables in offline database (SQLite)
     scanned_certificate =  "CREATE TABLE scanned_certificate (reference_number TEXT, date TEXT, time TEXT)";
@@ -41,6 +42,7 @@ public class OfflineDB extends SQLiteOpenHelper {
     failed_departure =  "CREATE TABLE failed_departure (reference_number TEXT, date TEXT, time TEXT)";
     checked_in = "CREATE TABLE checked_in (reference_number TEXT, name TEXT, checkins TEXT, date TEXT)";
     applications = "CREATE TABLE applications (reference_number TEXT, name TEXT, nationality TEXT, arrival_date TEXT,birth_date TEXT, passport_number TEXT, application_status TEXT)";
+    claims =  "CREATE TABLE claims (reference_number TEXT, date TEXT, time TEXT)";
 
     // Executing query to Create Table in offline database (SQLite)
     sqLiteDatabase.execSQL(scanned_certificate);
@@ -49,6 +51,7 @@ public class OfflineDB extends SQLiteOpenHelper {
     sqLiteDatabase.execSQL(failed_departure);
     sqLiteDatabase.execSQL(checked_in);
     sqLiteDatabase.execSQL(applications);
+    sqLiteDatabase.execSQL(claims);
 
     }
 
@@ -62,6 +65,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         String failedDeparture = "DROP TABLE IF EXISTS failed_certificate";
         String checked_in = "DROP TABLE IF EXISTS checked_in";
         String applications = "DROP TABLE IF EXISTS applications";
+        String claims = "DROP TABLE IF EXISTS claims";
 
         // Executing Drop Table Queries
         sqLiteDatabase.execSQL(scannedCertificates);
@@ -70,6 +74,7 @@ public class OfflineDB extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(failedDeparture);
         sqLiteDatabase.execSQL(checked_in);
         sqLiteDatabase.execSQL(applications);
+        sqLiteDatabase.execSQL(claims);
     }
 
     public void insertApplications(JSONObject jsonObject) {
@@ -448,6 +453,37 @@ public class OfflineDB extends SQLiteOpenHelper {
         } finally {
             database.close();
         }
+    }
+
+    // Inserting claim in database
+    public void insertClaim(String reference_number, String date, String time){
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        try {
+            values.put("reference_number", reference_number);
+            values.put("date", date);
+            values.put("time", time);
+            System.out.println("Insert Claim 🤝" + values);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        database.insert("claims", null, values);
+        database.close();
+    }
+
+    // Calculating Total Claims
+    public int totalClaims() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Date today = new Date();
+        String query = "SELECT * FROM claims " + "WHERE TRIM(date)='" + dateFormat.format(today) +"'";
+        SQLiteDatabase database = this.getWritableDatabase();
+        Cursor cursor = database.rawQuery(query, null);
+        int count = cursor.getCount();
+        cursor.close();
+        database.close();
+        return count;
     }
 
 }

@@ -10,13 +10,14 @@ public class Config {
     // public static final String ENDPOINT = "http://172.16.10.161:2004/pos/"; // Vicent
 
     // Demo endPoint
-//   public static final String ENDPOINT = "https://earrival.rahisi.co.tz/api/pos/";
+   public static final String ENDPOINT = "https://earrival.rahisi.co.tz/api/pos/";
 
     // Live endpoint
-      public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
+//      public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
 
-    //public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
+//    public static final String ENDPOINT = "https://man.zicinbound.co.tz/api/pos/";
 
+    public static final String APP_SPLASH = ENDPOINT + "app_splash";
     public static final String OFFICER_LOGIN = ENDPOINT + "officer_login";
     public static final String GET_APPLICANT = ENDPOINT + "get_policy_applicant";
 
@@ -24,6 +25,7 @@ public class Config {
     public static final String MARK_SEIZED = ENDPOINT + "markSeized";
     public static final String CHANGE_PIN = ENDPOINT + "change_pin";
     public static final String RESET_PIN = ENDPOINT + "officer_reset_pin";
+    public static final String SUBMIT_CLAIM = ENDPOINT + "verify_insurance_details";
 
     public static final String AUTH_TOKEN = "AUTH_TOKEN";
     public static final String LOGIN_CREDENTIAL = "LOGIN_CREDENTIAL";
@@ -32,6 +34,12 @@ public class Config {
     public static final String DOMAIN = "DOMAIN";
     public static final String ENTRYPOINT_ID = "ENTRYPOINT_ID";
     public static final String ENTRYPOINT = "ENTRYPOINT";
+    public static final String INSPECTOR_TYPE = "inspector_type";
+    public static final String HOSPITALS = "hospital_names";
+    public static final String COMPLAIN = "complain_type";
+    public static final String ACCIDENT_TYPE = "accident_type";
+    public static final String REPATRIATION_TYPE = "repatriation_type";
+    public static final String REPATRIATION_STATUS = "repatriation_status";
 
     /** SHARED PREFS */
     public static final String SHARED_PREF_NAME = "ZIC_APP";

@@ -51,4 +51,8 @@
     <string name="verification_failed">Verification Failed</string>
     <string name="error">Error</string>
     <string name="qrcode_scan_success">Scan Success</string>
+    <string name="verify_passport">Verify passport</string>
+    <string name="hospital_inspector">Mkaguzi wa Hospital</string>
+    <string name="total_claims">Jumla ya Madai:</string>
+    <string name="scan_travel_insurance">Hakiki Bima</string>
 </resources>
